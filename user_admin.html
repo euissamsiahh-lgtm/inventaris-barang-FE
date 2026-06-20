@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User & Role - STOK.KU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --surface: #fff;
+      --surface-strong: #0f2340;
+      --text: #111827;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #0f2340;
+      --danger: #dc2626;
+      --radius: 8px;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+
+    /* Topbar */
+    .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .menu-icon { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+    .menu-icon span { display: block; width: 24px; height: 2px; background: var(--accent); }
+    .profile-section { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .profile-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--accent); display: grid; place-items: center; }
+    .profile-avatar svg { width: 18px; height: 18px; fill: var(--accent); }
+    .profile-name { font-weight: 500; font-size: 14px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+
+    /* Sidebar */
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);opacity:0;visibility:hidden;transition:0.3s;z-index:998}
+    .sidebar-overlay.show{opacity:1;visibility:visible}
+    .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:#051428;box-shadow:4px 0 24px rgba(0,0,0,0.2);transform:translateX(-100%);transition:0.3s;z-index:999;display:flex;flex-direction:column;color:#fff}
+    .sidebar.show{transform:translateX(0)}
+    .sidebar-header{background:#4b5a75;padding:20px 24px;display:flex;justify-content:space-between;align-items:center}
+    .sidebar-header h2{margin:0;font-size:20px;color:#fff;letter-spacing:1px;text-align:center;flex:1}
+    .close-btn{background:none;border:none;cursor:pointer;color:#fff;display:flex;align-items:center;padding:0}
+    .sidebar-nav{padding:16px 0;display:flex;flex-direction:column;flex:1;overflow-y:auto}
+    .nav-link{padding:12px 32px;text-decoration:none;color:#e2e8f0;font-size:14px;font-weight:600;transition:0.2s;display:flex;align-items:center;gap:12px}
+    .nav-link:hover{background:rgba(255,255,255,0.08);color:#fff}
+    .nav-link.active{background:rgba(255,255,255,0.15);color:#fff;border-left:3px solid transparent}
+    .sidebar-divider{height:1px;background:rgba(255,255,255,0.15);border:none;margin:12px 24px}
+    .sidebar-footer{padding:0 0 24px 0}
+    .logout-link{justify-content:center;margin-top:12px}
+
+    /* Page Content */
+    .page { padding: 26px 32px; max-width: 1200px; margin: 0 auto; }
+    .page-title { font-size: 24px; font-weight: 700; margin: 0 0 24px 0; }
+
+    /* Search Bar */
+    .search-container { display: flex; gap: 0; margin-bottom: 24px; }
+    .search-input { flex: 1; padding: 12px 16px; border: 1px solid var(--accent); border-right: none; border-radius: 4px 0 0 4px; font-size: 14px; outline: none; font-family: inherit; }
+    .search-input::placeholder { color: #a0aec0; }
+    .btn-search { background: var(--surface-strong); color: #fff; border: 1px solid var(--surface-strong); padding: 12px 48px; border-radius: 0 4px 4px 0; font-weight: 600; font-size: 14px; cursor: pointer; }
+
+    /* Table */
+    .table-container { background: var(--surface); margin-bottom: 24px; overflow-x: auto; }
+    .table-bordered { width: 100%; border-collapse: collapse; text-align: center; }
+    .table-bordered th, .table-bordered td { border: 1px solid var(--accent); padding: 14px 12px; font-size: 14px; }
+    .table-bordered th { font-weight: 700; }
+
+    /* Status Badge */
+    .badge-aktif { color: #16a34a; font-weight: 600; }
+    .badge-nonaktif { color: var(--danger); font-weight: 600; }
+
+    /* Action Buttons */
+    .action-buttons { display: flex; gap: 8px; justify-content: center; }
+    .btn-icon { background: none; border: 1px solid var(--accent); border-radius: 4px; width: 32px; height: 32px; display: grid; place-items: center; cursor: pointer; }
+    .btn-icon svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Dual Form Section */
+    .form-wrapper { background: var(--surface-strong); border-radius: var(--radius); padding: 24px; display: flex; gap: 24px; }
+    .form-card { background: var(--surface); border-radius: 8px; padding: 24px; }
+    .form-card-user { flex: 1; }
+    .form-card-role { flex: 1; }
+    .form-title { font-size: 15px; font-weight: 700; margin: 0 0 20px 0; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--text); }
+    .form-input, .form-select, .form-textarea {
+      padding: 10px 14px;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: #a0aec0; }
+    .form-textarea { resize: vertical; min-height: 100px; }
+
+    .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+    .btn-cancel { background: var(--surface); border: 1px solid var(--accent); color: var(--text); padding: 10px 28px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    .btn-save { background: var(--surface-strong); border: none; color: #fff; padding: 10px 28px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    @media (max-width: 900px) {
+      .form-wrapper { flex-direction: column; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .page { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <button class="close-btn" id="closeSidebar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h2>STOK.KU</h2>
+      <div style="width:20px"></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard_admin.html" class="nav-link">Dashboard</a>
+      <a href="databarang_admin.html" class="nav-link">Data Barang</a>
+      <a href="laporan_stok_admin.html" class="nav-link">Laporan Stok</a>
+      <a href="#" class="nav-link">Laporan Barang Masuk</a>
+      <a href="laporan_bk_admin.html" class="nav-link">Laporan Barang Keluar</a>
+      <a href="mutasi_barang_admin.html" class="nav-link">Mutasi Barang</a>
+      <hr class="sidebar-divider">
+      <a href="kategori_brg_admin.html" class="nav-link">Kategori</a>
+      <a href="satuan_admin.html" class="nav-link">Satuan</a>
+      <a href="#" class="nav-link">Supplier</a>
+      <hr class="sidebar-divider">
+      <a href="user_admin.html" class="nav-link active">User & Role</a>
+    </nav>
+    <div class="sidebar-footer">
+      <hr class="sidebar-divider">
+      <a href="#" class="nav-link logout-link" onclick="logout()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Keluar
+      </a>
+    </div>
+  </div>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="menu-icon">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="profile-section">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+      <div class="profile-name">
+        Admin
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <h1 class="page-title">User & Role</h1>
+
+    <!-- Search -->
+    <div class="search-container">
+      <input type="text" class="search-input" id="searchKeyword" placeholder="Cari user & role">
+      <button class="btn-search" id="btnSearch">Tampilkan</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="table-bordered">
+        <thead>
+          <tr>
+            <th style="width:60px">No</th>
+            <th>Nama</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th style="width:120px">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="6" style="text-align:center;color:var(--muted);padding:32px 0">Memuat data user...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Dual Form -->
+    <div class="form-wrapper">
+
+      <!-- Form Tambah/Edit User -->
+      <div class="form-card form-card-user">
+        <h3 class="form-title" id="formUserTitle">Tambah/Edit User</h3>
+        <input type="hidden" id="userId">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nama</label>
+            <input type="text" class="form-input" id="userName" placeholder="Masukan Nama Lengkap">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-input" id="userEmail" placeholder="Masukan Email">
+          </div>
+          <div class="form-group">
+            <label>Kata Sandi</label>
+            <input type="password" class="form-input" id="userPassword" placeholder="Masukan Kata Sandi">
+          </div>
+          <div class="form-group">
+            <label>Konfirmasi kata sandi</label>
+            <input type="password" class="form-input" id="userPasswordConfirm" placeholder="Masukan Ulang Kata Sandi">
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <select class="form-select" id="userRole">
+              <option value="">Pilih Role</option>
+              <option value="admin">Administrator</option>
+              <option value="petugas">Petugas Gudang</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-select" id="userStatus">
+              <option value="">Pilih Status</option>
+              <option value="aktif">Aktif</option>
+              <option value="nonaktif">Tidak Aktif</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" id="btnCancelUser">Batal</button>
+          <button class="btn-save" id="btnSaveUser">Simpan</button>
+        </div>
+      </div>
+
+      <!-- Form Kelola Role -->
+      <div class="form-card form-card-role">
+        <h3 class="form-title">Kelola Role</h3>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="form-group">
+            <label>Nama Role</label>
+            <input type="text" class="form-input" id="roleName" placeholder="Masukan Nama Role">
+          </div>
+          <div class="form-group">
+            <label>Deskripsi</label>
+            <textarea class="form-textarea" id="roleDesc" placeholder="Masukan Deskripsi Role"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" id="btnCancelRole">Batal</button>
+          <button class="btn-save" id="btnSaveRole">Simpan</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Sidebar
+    const menuBtn = document.querySelector('.menu-icon');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const closeBtn = document.getElementById('closeSidebar');
+
+    menuBtn.addEventListener('click', () => { sidebar.classList.add('show'); overlay.classList.add('show'); });
+    const closeMenu = () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); };
+    closeBtn.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('auth_token');
+      window.location.href = 'login.html';
+    }
+
+    // API
+    const API_BASE_URL = 'http://192.168.88.74/inventaris-barang-BE/public/api';
+    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+    if (!token) window.location.href = 'login.html';
+
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    const tableBody = document.getElementById('tableBody');
+    const searchKeyword = document.getElementById('searchKeyword');
+    let isEditingUser = false;
+
+    async function fetchUsers() {
+      tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px 0">Memuat data user...</td></tr>';
+      let url = `${API_BASE_URL}/users`;
+      if (searchKeyword.value) url += `?search=${encodeURIComponent(searchKeyword.value)}`;
+
+      try {
+        const res = await fetch(url, { headers });
+        if (res.status === 401) { logout(); return; }
+        const data = await res.json();
+        if (res.ok) renderTable(data.data);
+        else tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:32px 0">Gagal: ${data.message}</td></tr>`;
+      } catch {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:32px 0">Kesalahan jaringan</td></tr>';
+      }
+    }
+
+    function renderTable(data) {
+      tableBody.innerHTML = '';
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px 0">Tidak ada data user</td></tr>';
+        return;
+      }
+      data.forEach((item, idx) => {
+        const isAktif = item.status === 'aktif' || item.is_active === true || item.is_active === 1;
+        const statusLabel = isAktif ? 'Aktif' : 'Tidak Aktif';
+        const statusClass = isAktif ? 'badge-aktif' : 'badge-nonaktif';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td>${item.name}</td>
+          <td>${item.email}</td>
+          <td>${item.role || '-'}</td>
+          <td class="${statusClass}">${statusLabel}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-icon" title="Edit" onclick='editUser(${JSON.stringify(item)})'>
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button class="btn-icon" title="Hapus" onclick="deleteUser(${item.id})">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+      // Empty row
+      const empty = document.createElement('tr');
+      empty.innerHTML = '<td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td>';
+      tableBody.appendChild(empty);
+    }
+
+    async function saveUser() {
+      const id = document.getElementById('userId').value;
+      const name = document.getElementById('userName').value;
+      const email = document.getElementById('userEmail').value;
+      const password = document.getElementById('userPassword').value;
+      const passwordConfirm = document.getElementById('userPasswordConfirm').value;
+      const role = document.getElementById('userRole').value;
+      const status = document.getElementById('userStatus').value;
+
+      if (!name || !email || !role) { alert('Harap isi nama, email, dan role!'); return; }
+      if (!isEditingUser && !password) { alert('Harap isi kata sandi!'); return; }
+      if (password && password !== passwordConfirm) { alert('Konfirmasi kata sandi tidak cocok!'); return; }
+
+      const payload = { name, email, role, status };
+      if (password) { payload.password = password; payload.password_confirmation = passwordConfirm; }
+
+      const url = isEditingUser ? `${API_BASE_URL}/users/${id}` : `${API_BASE_URL}/users`;
+      const method = isEditingUser ? 'PUT' : 'POST';
+
+      const btnSave = document.getElementById('btnSaveUser');
+      btnSave.textContent = 'Menyimpan...';
+      btnSave.disabled = true;
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          resetUserForm();
+          fetchUsers();
+          alert(isEditingUser ? 'User berhasil diperbarui!' : 'User berhasil ditambahkan!');
+        } else {
+          const data = await res.json();
+          alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
+        }
+      } catch { alert('Kesalahan jaringan'); }
+      finally { btnSave.textContent = 'Simpan'; btnSave.disabled = false; }
+    }
+
+    function editUser(item) {
+      isEditingUser = true;
+      document.getElementById('formUserTitle').textContent = 'Edit User';
+      document.getElementById('userId').value = item.id;
+      document.getElementById('userName').value = item.name;
+      document.getElementById('userEmail').value = item.email;
+      document.getElementById('userPassword').value = '';
+      document.getElementById('userPasswordConfirm').value = '';
+      document.getElementById('userRole').value = item.role || '';
+      const isAktif = item.status === 'aktif' || item.is_active === true || item.is_active === 1;
+      document.getElementById('userStatus').value = isAktif ? 'aktif' : 'nonaktif';
+      document.querySelector('.form-wrapper').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('Apakah Anda yakin ingin menghapus user ini?')) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${id}`, { method: 'DELETE', headers });
+        if (res.ok) { fetchUsers(); alert('User berhasil dihapus!'); }
+        else { const d = await res.json(); alert('Gagal: ' + (d.message || 'Terjadi kesalahan')); }
+      } catch { alert('Kesalahan jaringan'); }
+    }
+
+    function resetUserForm() {
+      isEditingUser = false;
+      document.getElementById('formUserTitle').textContent = 'Tambah/Edit User';
+      ['userId','userName','userEmail','userPassword','userPasswordConfirm'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('userRole').value = '';
+      document.getElementById('userStatus').value = '';
+    }
+
+    // Role form (simple client-side, extend if API available)
+    document.getElementById('btnSaveRole').addEventListener('click', () => {
+      const name = document.getElementById('roleName').value;
+      if (!name) { alert('Harap isi nama role!'); return; }
+      alert(`Role "${name}" berhasil disimpan!`);
+      document.getElementById('roleName').value = '';
+      document.getElementById('roleDesc').value = '';
+    });
+    document.getElementById('btnCancelRole').addEventListener('click', () => {
+      document.getElementById('roleName').value = '';
+      document.getElementById('roleDesc').value = '';
+    });
+
+    document.getElementById('btnSearch').addEventListener('click', fetchUsers);
+    searchKeyword.addEventListener('keypress', e => { if (e.key === 'Enter') fetchUsers(); });
+    document.getElementById('btnSaveUser').addEventListener('click', saveUser);
+    document.getElementById('btnCancelUser').addEventListener('click', resetUserForm);
+
+    document.addEventListener('DOMContentLoaded', fetchUsers);
+  </script>
+</body>
+</html>
