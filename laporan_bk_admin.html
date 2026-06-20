@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mutasi Barang Admin - STOK.KU</title>
+  <title>Laporan Barang Keluar - STOK.KU</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -62,18 +62,20 @@
     .filter-input { padding: 10px 14px; border: 1px solid var(--accent); border-radius: 4px; font-size: 13px; outline: none; font-family: inherit; color: var(--text); }
     .filter-input::placeholder { color: #a0aec0; }
     
+    .filter-actions-container { display: flex; flex-direction: column; gap: 8px; }
     .filter-actions { display: flex; gap: 12px; align-items: flex-end; }
     .btn-show { background: var(--surface); border: 1px solid var(--accent); color: var(--accent); padding: 10px 24px; border-radius: 4px; font-weight: 600; cursor: pointer; }
     .btn-reset { background: var(--surface-strong); border: 1px solid var(--surface-strong); color: #fff; padding: 10px 24px; border-radius: 4px; font-weight: 600; cursor: pointer; }
 
     /* Stats Grid */
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
     .stat-box { background: var(--surface-strong); border-radius: var(--radius); padding: 20px; display: flex; align-items: center; gap: 16px; color: #fff; }
-    .stat-icon { width: 48px; height: 48px; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; display: grid; place-items: center; }
+    .stat-icon { width: 48px; height: 48px; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; display: grid; place-items: center; flex-shrink: 0; }
     .stat-icon svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .stat-info { display: flex; flex-direction: column; gap: 4px; }
-    .stat-info span { font-size: 13px; color: rgba(255,255,255,0.8); }
-    .stat-info strong { font-size: 28px; font-weight: 700; line-height: 1; }
+    .stat-info { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+    .stat-info span { font-size: 13px; color: rgba(255,255,255,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stat-info strong { font-size: 24px; font-weight: 700; line-height: 1.2; }
+    .stat-info .periode-text { font-size: 14px; font-weight: 600; margin-top: 4px; line-height: 1.4; }
 
     /* Table Section */
     .table-card { background: var(--surface); border: 1px solid var(--accent); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; overflow-x: auto; }
@@ -83,20 +85,19 @@
     .table tbody tr:last-child td { border-bottom: none; }
 
     /* Legend Section */
-    .legend-card { background: var(--surface-strong); border-radius: var(--radius); padding: 20px 24px; color: #fff; display: flex; align-items: center; gap: 16px; font-size: 13px; }
+    .legend-card { background: var(--surface-strong); border-radius: var(--radius); padding: 20px 24px; color: #fff; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
     .legend-card strong { font-weight: 700; }
-    .legend-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.4); margin: 0 8px; }
 
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
     @media (max-width: 900px) {
       .filter-row { flex-direction: column; align-items: stretch; }
-      .filter-actions { justify-content: flex-end; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .filter-actions-container { margin-top: 16px; }
     }
     @media (max-width: 600px) {
       .stats-grid { grid-template-columns: 1fr; }
       .filter-date-group { flex-direction: column; align-items: stretch; }
-      .legend-card { flex-direction: column; align-items: flex-start; gap: 8px; }
-      .legend-divider { display: none; }
     }
   </style>
 </head>
@@ -117,8 +118,8 @@
       <a href="databarang_admin.html" class="nav-link">Data Barang</a>
       <a href="laporan_stok_admin.html" class="nav-link">Laporan Stok</a>
       <a href="#" class="nav-link">Laporan Barang Masuk</a>
-      <a href="laporan_bk_admin.html" class="nav-link">Laporan Barang Keluar</a>
-      <a href="mutasi_barang_admin.html" class="nav-link active">Mutasi Barang</a>
+      <a href="laporan_bk_admin.html" class="nav-link active">Laporan Barang Keluar</a>
+      <a href="mutasi_barang_admin.html" class="nav-link">Mutasi Barang</a>
       <hr class="sidebar-divider">
       <a href="#" class="nav-link">Kategori</a>
       <a href="#" class="nav-link">Satuan</a>
@@ -156,7 +157,7 @@
   </div>
 
   <div class="page">
-    <h1 class="page-title">Mutasi Barang</h1>
+    <h1 class="page-title">Laporan Barang Keluar</h1>
 
     <!-- Filter Card -->
     <div class="filter-card">
@@ -166,27 +167,25 @@
           <div class="filter-item">
             <label>Tanggal</label>
             <div class="filter-date-group">
-              <input type="date" class="filter-input" id="startDate">
-              <span>s/d</span>
-              <input type="date" class="filter-input" id="endDate">
+              <input type="date" class="filter-input" id="startDate" style="width: 130px;">
+              <input type="date" class="filter-input" id="endDate" style="width: 130px;">
             </div>
           </div>
           <div class="filter-item">
-            <label>Barang</label>
-            <input type="text" class="filter-input" id="filterBarang" placeholder="Nama Barang">
+            <label>Tujuan</label>
+            <input type="text" class="filter-input" id="filterTujuan" placeholder="Nama tujuan">
           </div>
           <div class="filter-item">
-            <label>Jenis</label>
-            <select class="filter-input" id="filterJenis" style="min-width: 150px;">
-              <option value="">Semua Jenis</option>
-              <option value="masuk">Masuk</option>
-              <option value="keluar">Keluar</option>
-            </select>
+            <label>Barang</label>
+            <input type="text" class="filter-input" id="filterBarang" placeholder="Nama barang">
           </div>
         </div>
-        <div class="filter-actions">
-          <button class="btn-show" id="btnFilter">Tampilkan</button>
-          <button class="btn-reset" id="btnReset">Reset</button>
+        <div class="filter-actions-container">
+          <label style="font-size: 13px; font-weight: 600;">Tampilkan</label>
+          <div class="filter-actions">
+            <button class="btn-show" id="btnFilter">Tampilkan</button>
+            <button class="btn-reset" id="btnReset">Reset</button>
+          </div>
         </div>
       </div>
     </div>
@@ -198,26 +197,35 @@
           <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
         </div>
         <div class="stat-info">
-          <span>Total Masuk</span>
-          <strong id="valTotalMasuk">...</strong>
+          <span>Total Transaksi</span>
+          <strong id="valTotalTransaksi">...</strong>
         </div>
       </div>
       <div class="stat-box">
         <div class="stat-icon">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>
         </div>
         <div class="stat-info">
-          <span>Total Keluar</span>
-          <strong id="valTotalKeluar">...</strong>
+          <span>Barang Keluar</span>
+          <strong id="valBarangKeluar">...</strong>
         </div>
       </div>
       <div class="stat-box">
         <div class="stat-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg>
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
         </div>
         <div class="stat-info">
-          <span>Total Mutasi</span>
-          <strong id="valTotalMutasi">...</strong>
+          <span>Total Nilai Pengeluaran</span>
+          <strong id="valTotalNilai">...</strong>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </div>
+        <div class="stat-info">
+          <span>Periode</span>
+          <div class="periode-text" id="valPeriode">...</div>
         </div>
       </div>
     </div>
@@ -230,18 +238,19 @@
             <th>No</th>
             <th>Tanggal</th>
             <th>No. Referensi</th>
+            <th>Tujuan</th>
             <th>Nama Barang</th>
-            <th>Kode Barang</th>
-            <th>Jenis</th>
-            <th>Jumlah</th>
+            <th>Kode</th>
             <th>Satuan</th>
-            <th>Keterangan</th>
+            <th>Jumlah</th>
+            <th>Harga Satuan</th>
+            <th>Total</th>
             <th>Petugas</th>
           </tr>
         </thead>
         <tbody id="tableBody">
           <tr>
-            <td colspan="10" style="text-align: center; color: var(--muted); padding: 32px 0;">Memuat mutasi...</td>
+            <td colspan="11" style="text-align: center; color: var(--muted); padding: 32px 0;">Memuat laporan...</td>
           </tr>
         </tbody>
       </table>
@@ -249,10 +258,8 @@
 
     <!-- Legend -->
     <div class="legend-card">
-      <strong>Keterangan Jenis Mutasi :</strong>
-      <span><strong>Masuk</strong> = Menambah stok barang</span>
-      <div class="legend-divider"></div>
-      <span><strong>Keluar</strong> = Mengurangi stok barang</span>
+      <strong>Keterangan :</strong>
+      <span>Semua data pada laporan ini bersumber dari transaksi barang yang telah dicatat dalam sistem</span>
     </div>
 
   </div>
@@ -288,23 +295,27 @@
 
     const startDate = document.getElementById('startDate');
     const endDate = document.getElementById('endDate');
+    const filterTujuan = document.getElementById('filterTujuan');
     const filterBarang = document.getElementById('filterBarang');
-    const filterJenis = document.getElementById('filterJenis');
     const btnFilter = document.getElementById('btnFilter');
     const btnReset = document.getElementById('btnReset');
     const tableBody = document.getElementById('tableBody');
 
-    async function fetchMutasi() {
-        tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 32px 0;">Memuat mutasi...</td></tr>';
+    function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    async function fetchLaporanBK() {
+        tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--muted); padding: 32px 0;">Memuat laporan...</td></tr>';
         
         const params = new URLSearchParams();
         if(startDate.value) params.append('start_date', startDate.value);
         if(endDate.value) params.append('end_date', endDate.value);
+        if(filterTujuan.value) params.append('tujuan', filterTujuan.value);
         if(filterBarang.value) params.append('barang', filterBarang.value);
-        if(filterJenis.value) params.append('jenis', filterJenis.value);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/mutasi?${params.toString()}`, { headers });
+            const res = await fetch(`${API_BASE_URL}/laporan/barang-keluar?${params.toString()}`, { headers });
             
             if (res.status === 401) {
                 logout();
@@ -315,56 +326,56 @@
             if (res.ok) {
                 updateUI(data.data);
             } else {
-                tableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--danger); padding: 32px 0;">Gagal: ${data.message}</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger); padding: 32px 0;">Gagal: ${data.message}</td></tr>`;
             }
         } catch (err) {
-            tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--danger); padding: 32px 0;">Terjadi kesalahan jaringan</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--danger); padding: 32px 0;">Terjadi kesalahan jaringan</td></tr>';
         }
     }
 
     function updateUI(data) {
         // Update Stats
-        document.getElementById('valTotalMasuk').textContent = data.summary.total_masuk;
-        document.getElementById('valTotalKeluar').textContent = data.summary.total_keluar;
-        document.getElementById('valTotalMutasi').textContent = data.summary.total_mutasi;
+        document.getElementById('valTotalTransaksi').textContent = data.summary.total_transaksi;
+        document.getElementById('valBarangKeluar').textContent = data.summary.barang_keluar;
+        document.getElementById('valTotalNilai').textContent = 'Rp. ' + formatRupiah(data.summary.total_nilai_pengeluaran);
+        document.getElementById('valPeriode').textContent = data.summary.periode;
 
         // Update Table
         tableBody.innerHTML = '';
-        if(!data.mutasi || data.mutasi.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 32px 0;">Tidak ada riwayat mutasi</td></tr>';
+        if(!data.laporan || data.laporan.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--muted); padding: 32px 0;">Tidak ada laporan barang keluar</td></tr>';
             return;
         }
 
-        data.mutasi.forEach((item, idx) => {
+        data.laporan.forEach((item, idx) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${idx + 1}</td>
                 <td>${item.tanggal}</td>
                 <td>${item.no_referensi || '-'}</td>
+                <td>${item.tujuan || '-'}</td>
                 <td>${item.nama_barang}</td>
                 <td>${item.kode_barang}</td>
-                <td style="color: ${item.jenis.toLowerCase() === 'masuk' ? 'var(--accent)' : 'var(--danger)'}; font-weight: 600;">
-                    ${item.jenis}
-                </td>
-                <td>${item.jumlah}</td>
                 <td>${item.satuan}</td>
-                <td>${item.keterangan || '-'}</td>
+                <td>${item.jumlah}</td>
+                <td>${formatRupiah(item.harga_satuan)}</td>
+                <td>${formatRupiah(item.total)}</td>
                 <td>${item.petugas || '-'}</td>
             `;
             tableBody.appendChild(tr);
         });
     }
 
-    btnFilter.addEventListener('click', fetchMutasi);
+    btnFilter.addEventListener('click', fetchLaporanBK);
     btnReset.addEventListener('click', () => {
         startDate.value = '';
         endDate.value = '';
+        filterTujuan.value = '';
         filterBarang.value = '';
-        filterJenis.value = '';
-        fetchMutasi();
+        fetchLaporanBK();
     });
 
-    document.addEventListener('DOMContentLoaded', fetchMutasi);
+    document.addEventListener('DOMContentLoaded', fetchLaporanBK);
   </script>
 </body>
 </html>
