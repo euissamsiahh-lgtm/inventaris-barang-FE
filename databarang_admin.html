@@ -301,15 +301,18 @@
     /* Sidebar */
     .sidebar-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);opacity:0;visibility:hidden;transition:0.3s;z-index:998}
     .sidebar-overlay.show{opacity:1;visibility:visible}
-    .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:var(--surface);box-shadow:4px 0 24px rgba(0,0,0,0.08);transform:translateX(-100%);transition:0.3s;z-index:999;display:flex;flex-direction:column}
+    .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:#051428;box-shadow:4px 0 24px rgba(0,0,0,0.2);transform:translateX(-100%);transition:0.3s;z-index:999;display:flex;flex-direction:column;color:#fff}
     .sidebar.show{transform:translateX(0)}
-    .sidebar-header{padding:24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
-    .sidebar-header h2{margin:0;font-size:20px;color:var(--accent)}
-    .close-btn{background:none;border:none;font-size:28px;cursor:pointer;color:var(--muted);line-height:1}
-    .sidebar-nav{padding:20px 16px;display:flex;flex-direction:column;gap:8px}
-    .nav-link{padding:12px 16px;text-decoration:none;color:var(--text);border-radius:12px;font-weight:500;transition:0.2s}
-    .nav-link:hover{background:var(--accent-soft);color:var(--accent)}
-    .nav-link.active{background:var(--accent);color:#fff}
+    .sidebar-header{background:#4b5a75;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:none}
+    .sidebar-header h2{margin:0;font-size:20px;color:#fff;letter-spacing:1px;text-align:center;flex:1}
+    .close-btn{background:none;border:none;cursor:pointer;color:#fff;display:flex;align-items:center;padding:0}
+    .sidebar-nav{padding:16px 0;display:flex;flex-direction:column;flex:1;overflow-y:auto}
+    .nav-link{padding:12px 32px;text-decoration:none;color:#e2e8f0;font-size:14px;font-weight:600;transition:0.2s;display:flex;align-items:center;gap:12px}
+    .nav-link:hover{background:rgba(255,255,255,0.08);color:#fff}
+    .nav-link.active{background:rgba(255,255,255,0.15);color:#fff}
+    .sidebar-divider{height:1px;background:rgba(255,255,255,0.15);border:none;margin:12px 24px}
+    .sidebar-footer{padding:0 0 24px 0}
+    .logout-link{justify-content:center;margin-top:12px}
   </style>
 </head>
 <body>
@@ -318,13 +321,37 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
+      <button class="close-btn" id="closeSidebar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
       <h2>STOK.KU</h2>
-      <button class="close-btn" id="closeSidebar">&times;</button>
+      <div style="width:20px"></div>
     </div>
     <nav class="sidebar-nav">
       <a href="dashboard_admin.html" class="nav-link">Dashboard</a>
       <a href="databarang_admin.html" class="nav-link active">Data Barang</a>
+      <a href="#" class="nav-link">Laporan Stok</a>
+      <a href="#" class="nav-link">Laporan Barang Masuk</a>
+      <a href="#" class="nav-link">Laporan Barang Keluar</a>
+      <a href="#" class="nav-link">Mutasi Barang</a>
+      
+      <hr class="sidebar-divider">
+      
+      <a href="#" class="nav-link">Kategori</a>
+      <a href="#" class="nav-link">Satuan</a>
+      <a href="#" class="nav-link">Supplier</a>
+      
+      <hr class="sidebar-divider">
+      
+      <a href="#" class="nav-link">User & Role</a>
     </nav>
+    <div class="sidebar-footer">
+      <hr class="sidebar-divider">
+      <a href="#" class="nav-link logout-link" onclick="logout()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Keluar
+      </a>
+    </div>
   </div>
 
   <!-- Topbar -->
@@ -630,6 +657,12 @@
             alert('Terjadi kesalahan jaringan.');
         }
     };
+
+    function logout() {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('auth_token');
+        window.location.href = 'login.html';
+    }
 
     document.addEventListener('DOMContentLoaded', loadBarang);
   </script>
