@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin - STOK.KU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --surface:#fff;
+      --surface-strong:#0f233f;
+      --text:#111827;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --accent:#0f2340;
+      --accent-soft:#eff4ff;
+      --success:#1d4ed8;
+      --danger:#dc2626;
+      --radius:18px;
+      font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text)}
+    .page{padding:26px 32px}
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+    .header-left h1{font-size:28px;margin:0}
+    .header-left p{margin:4px 0 0;color:var(--muted)}
+    .topbar{display:flex;align-items:center;gap:16px}
+    .menu-btn{width:44px;height:44px;border-radius:14px;border:1px solid var(--border);display:grid;place-items:center;background:var(--surface);cursor:pointer}
+    .menu-btn span{display:block;width:18px;height:2px;background:var(--text);box-shadow:0 6px 0 var(--text),0 -6px 0 var(--text)}
+    .profile{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 14px;cursor:pointer}
+    .profile-icon{width:35px;height:35px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+    .profile-name{display:flex;flex-direction:column}
+    .profile-name span:first-child{font-weight:600}
+    .top-cards{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:18px;margin-bottom:22px}
+    .stat-card{background:var(--surface);border-radius:18px;padding:22px;min-height:128px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 30px rgba(15,23,42,0.06)}
+    .stat-card strong{display:block;font-size:26px;color:var(--accent);margin-bottom:8px}
+    .stat-card span{color:var(--muted);font-size:13px}
+    .layout{display:grid;grid-template-columns:2fr 1fr;gap:22px}
+    .panel{background:var(--surface);border-radius:22px;padding:24px;border:1px solid var(--border);box-shadow:0 18px 50px rgba(15,23,42,0.06)}
+    .panel header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .panel header h2{font-size:18px;margin:0}
+    .panel header .meta{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:13px}
+    .chart-card{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .small-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .small-card{background:var(--surface-strong);border-radius:18px;padding:20px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;min-height:108px}
+    .small-card span{font-size:13px;color:#cbd5e1}
+    .small-card strong{font-size:30px;margin-top:6px}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{padding:14px 12px;text-align:left;border-bottom:1px solid #e2e8f0}
+    .table th{color:var(--muted);font-weight:600;font-size:13px}
+    .table td{color:var(--text);font-size:14px}
+    .table tbody tr:last-child td{border-bottom:none}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:var(--accent-soft);border-radius:14px;color:var(--accent);font-weight:600;font-size:13px}
+    .chart-area{position:relative;height:360px;overflow:hidden}
+    .line-graph{position:absolute;inset:0}
+    .graph-label{position:absolute;top:14px;left:18px;background:rgba(255,255,255,0.92);padding:10px 14px;border-radius:14px;box-shadow:0 10px 30px rgba(15,23,42,0.08);font-size:13px;color:#334155}
+    .stat-row{display:flex;justify-content:space-between;gap:14px;margin-bottom:20px}
+    .stat-row .item{background:var(--surface);border-radius:18px;padding:18px;flex:1;display:flex;flex-direction:column;gap:8px;min-height:108px;box-shadow:0 10px 30px rgba(15,23,42,0.06)}
+    .stat-row .item strong{font-size:30px}
+    .stat-row .item span{color:var(--muted)}
+    .list-card{margin-top:12px}
+    .pie-card{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .pie-box{background:var(--surface);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:22px;align-items:center;justify-content:center;min-height:320px}
+    .pie-box svg{width:220px;height:220px}
+    .pie-legend{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+    .legend-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+    .legend-dot{width:12px;height:12px;border-radius:999px;display:inline-block}
+    .legend-1{background:#0f2340}
+    .legend-2{background:#2563eb}
+    .legend-3{background:#f97316}
+    .legend-4{background:#14b8a6}
+    .legend-total{font-size:12px;color:var(--accent);margin-top:10px;text-align:center}
+    @media(max-width:1220px){.top-cards{grid-template-columns:repeat(2,minmax(140px,1fr))}}
+    @media(max-width:980px){.layout{grid-template-columns:1fr}.panel:last-child{order:2}}
+    @media(max-width:720px){.page{padding:20px 16px}.header,.stat-row{flex-direction:column;align-items:flex-start}.top-cards{grid-template-columns:1fr}.chart-card{grid-template-columns:1fr}.small-panel{grid-template-columns:1fr}}  
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="header-left">
+        <div class="topbar">
+          <button class="menu-btn" aria-label="Menu"><span></span></button>
+          <div>
+            <h1>Dashboard</h1>
+            <p>Selamat datang, Admin!</p>
+          </div>
+        </div>
+      </div>
+      <div class="profile" aria-label="Profil Admin">
+        <div class="profile-icon">A</div>
+        <div class="profile-name"><span>Admin</span><small style="color:var(--muted)">Online</small></div>
+      </div>
+    </div>
+
+    <div class="top-cards">
+      <div class="stat-card"><span>Total Barang</span><strong>123</strong></div>
+      <div class="stat-card"><span>Total Stok</span><strong>900</strong></div>
+      <div class="stat-card"><span>Barang Masuk</span><strong>200</strong></div>
+      <div class="stat-card"><span>Barang Keluar</span><strong>130</strong></div>
+      <div class="stat-card"><span>Stok Minimum</span><strong>900</strong></div>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <header>
+          <div><h2>Grafik Stok Barang (30 Hari Terakhir)</h2></div>
+          <div class="meta">Performa stok</div>
+        </header>
+        <div class="chart-area">
+          <div class="graph-label">Stok Tersedia: 900 unit</div>
+          <svg class="line-graph" viewBox="0 0 100 60" preserveAspectRatio="none">
+            <defs><linearGradient id="strokeGradient" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#0f2340"/></linearGradient></defs>
+            <path d="M0,48 L10,40 L20,46 L30,36 L40,44 L50,32 L60,36 L70,30 L80,28 L90,24 L100,18" fill="none" stroke="url(#strokeGradient)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M0,48 L10,40 L20,46 L30,36 L40,44 L50,32 L60,36 L70,30 L80,28 L90,24 L100,18 L100,60 L0,60 Z" fill="rgba(37,99,235,0.12)"/>
+          </svg>
+        </div>
+        <div class="stat-row">
+          <div class="item"><span>10 Mei</span><strong>120</strong></div>
+          <div class="item"><span>15 Mei</span><strong>92</strong></div>
+          <div class="item"><span>20 Mei</span><strong>130</strong></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="small-panel">
+          <div class="small-card"><span>Masuk</span><strong>111</strong></div>
+          <div class="small-card"><span>Keluar</span><strong>111</strong></div>
+          <div class="small-card"><span>Total Mutasi</span><strong>111</strong></div>
+        </div>
+        <div class="list-card">
+          <header style="margin-bottom:12px;"><h2>Stok Menipis</h2></header>
+          <table class="table">
+            <thead><tr><th>No</th><th>Nama Barang</th><th>Stok</th><th>Stok Minimum</th><th>Satuan</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Kertas A4</td><td>8</td><td>50</td><td>Rim</td></tr>
+              <tr><td>2</td><td>Kertas A4</td><td>8</td><td>50</td><td>Rim</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout" style="margin-top:20px">
+      <div class="panel">
+        <header><h2>Aktivitas Terbaru</h2></header>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>No</th><th>Tanggal</th><th>Jenis</th><th>Nama Barang</th><th>Jumlah</th><th>Oleh</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>22/05/24</td><td>Masuk</td><td>Kertas A4</td><td>50</td><td>Petugas Gudang</td></tr>
+            <tr><td>2</td><td>22/05/24</td><td>Keluar</td><td>Kertas A4</td><td>50</td><td>Petugas Gudang</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pie-card">
+        <div class="pie-box">
+          <h2 style="margin:0 0 10px 0;">Ringkasan Mutasi</h2>
+          <svg viewBox="0 0 42 42" width="220" height="220">
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#cbd5e1" stroke-width="8"/>
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#0f2340" stroke-width="8" stroke-dasharray="31.4 98.96" stroke-linecap="round" transform="rotate(-90 21 21)"/>
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#2563eb" stroke-width="8" stroke-dasharray="44.4 85.96" stroke-linecap="round" transform="rotate(-30 21 21)"/>
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#f97316" stroke-width="8" stroke-dasharray="11.1 118.26" stroke-linecap="round" transform="rotate(70 21 21)"/>
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#14b8a6" stroke-width="8" stroke-dasharray="13.2 116.16" stroke-linecap="round" transform="rotate(140 21 21)"/>
+          </svg>
+          <div class="legend-item"><span class="legend-dot legend-1"></span>Barang Masuk (200)</div>
+          <div class="legend-item"><span class="legend-dot legend-2"></span>Stok Tersedia (900)</div>
+          <div class="legend-item"><span class="legend-dot legend-3"></span>Barang Keluar (130)</div>
+          <div class="legend-item"><span class="legend-dot legend-4"></span>Stok Minimum (200)</div>
+          <div class="legend-total">Total 100%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
