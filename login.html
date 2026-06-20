@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>STOK.KU — Masuk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --navy:#243254;
+            --navy-dark:#0f2340;
+            --muted:#7b8699;
+            --accent:#0d2547;
+            --border:#d9d9df;
+            --radius:10px;
+            --glass: rgba(255,255,255,0.04);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        }
+        *{box-sizing:border-box}
+        body,html{height:100%;margin:0;background:#f7f8fb;color:#111}
+        .split{min-height:100vh;display:flex}
+        .left{
+            flex:1.1;background:linear-gradient(180deg,var(--navy),#2e3f60);color:#fff;padding:64px 56px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:28px;
+        }
+        .brand{display:flex;flex-direction:column;gap:18px}
+        .logo{
+            display:flex;align-items:center;gap:14px
+        }
+        .cube{
+            width:56px;height:56px;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,0.06)
+        }
+        .cube svg{width:36px;height:36px;opacity:0.95}
+        .brand h1{font-size:28px;margin:0;letter-spacing:1px}
+        .brand p{max-width:320px;margin:0;color:rgba(255,255,255,0.85);line-height:1.5}
+        .illustration{margin-top:12px;opacity:0.95}
+
+        .right{flex:1;padding:48px 64px;display:flex;align-items:center;justify-content:center}
+        .card{width:100%;max-width:420px;background:#fff;border-radius:12px;padding:36px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(16,24,40,0.06)}
+        .card h2{margin:0 0 6px 0;color:var(--navy-dark);font-weight:700}
+        .card p.lead{margin:0 0 22px 0;color:var(--muted)}
+
+        .field{display:flex;flex-direction:column;margin-bottom:16px}
+        label{font-size:13px;margin-bottom:8px;color:var(--navy-dark);font-weight:600}
+        input[type="email"],input[type="password"]{height:44px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);outline:none;font-size:14px}
+        .password-wrap{position:relative}
+        .toggle-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted)}
+
+        .forgot{font-size:13px;color:var(--muted);text-align:right;margin-top:6px}
+        .btn{display:inline-block;width:100%;padding:12px;border-radius:8px;border:0;background:var(--accent);color:#fff;font-weight:700;margin-top:12px;cursor:pointer}
+        .btn.secondary{background:#fff;color:var(--navy);border:1px solid var(--border)}
+
+        .divider{display:flex;align-items:center;gap:12px;margin:18px 0}
+        .divider hr{flex:1;border:none;border-top:1px solid var(--border);margin:0}
+        .or{font-size:13px;color:var(--muted)}
+
+        .small-line{height:2px;background:rgba(0,0,0,0.06);margin:18px 0}
+
+        @media (max-width:900px){
+            .split{flex-direction:column}
+            .left{padding:36px;text-align:center;align-items:center}
+            .right{padding:36px}
+        }
+    </style>
+</head>
+<body>
+    <div class="split">
+        <aside class="left">
+            <div class="brand">
+                <div class="logo">
+                    <div class="cube" aria-hidden>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L20 6v8l-8 4-8-4V6l8-4z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 22v-10" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1>STOK.KU</h1>
+                        <hr style="width:56px;border-color:rgba(255,255,255,0.16);border-top-width:2px;margin:6px 0">
+                    </div>
+                </div>
+                <p>Kelola data barang, stok, barang masuk dan barang keluar dengan mudah dan terorganisir</p>
+            </div>
+
+            <div class="illustration" aria-hidden>
+                <!-- Placeholder boxes illustration -->
+                <svg width="220" height="140" viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="8" y="48" width="64" height="48" rx="6" fill="#f9c66a"/>
+                    <rect x="84" y="30" width="90" height="70" rx="6" fill="#ffd88a"/>
+                    <rect x="16" y="18" width="40" height="28" rx="4" fill="#fff" opacity="0.08"/>
+                </svg>
+            </div>
+        </aside>
+
+        <main class="right">
+            <div class="card" role="main">
+                <h2>Masuk</h2>
+                <p class="lead">Silakan masuk untuk melanjutkan</p>
+
+                <form id="loginForm">
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" type="email" placeholder="Masukkan Email" required>
+                    </div>
+
+                    <div class="field password-wrap">
+                        <label for="password">Kata Sandi</label>
+                        <input id="password" type="password" placeholder="Masukkan Kata Sandi" required>
+                        <button type="button" class="toggle-eye" aria-label="Tampilkan kata sandi" onclick="togglePassword()">👁️</button>
+                        <div class="forgot"><a href="#" style="color:var(--muted);text-decoration:none">Lupa Kata Sandi?</a></div>
+                    </div>
+
+                      <button class="btn" type="submit" id="submitBtn">Masuk</button>
+
+                    <div class="divider"><hr><div class="or">Atau</div><hr></div>
+
+                    <button type="button" class="btn secondary">Masuk Sebagai Petugas</button>
+                    <div id="msg" aria-live="polite" style="margin-top:12px;color:#b00020;font-size:13px"></div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Config: ganti URL ini dengan URL endpoint backend Anda
+        const API_URL = 'http://localhost:8000/api/auth/login';
+
+        function togglePassword(){
+            const p = document.getElementById('password');
+            if(p.type === 'password'){
+                p.type = 'text';
+            } else {
+                p.type = 'password';
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e){
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const msg = document.getElementById('msg');
+            const submitBtn = document.getElementById('submitBtn');
+
+            msg.textContent = '';
+            if(!email || !password){
+                msg.textContent = 'Email dan kata sandi wajib diisi.';
+                return;
+            }
+
+            // UI state
+            submitBtn.disabled = true;
+            const prevText = submitBtn.textContent;
+            submitBtn.textContent = 'Memproses...';
+
+            try{
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({email, password})
+                });
+
+                const data = await res.json().catch(()=>({}));
+
+                if(res.ok){
+                    // contoh menyimpan token dan redirect
+                    if(data.token) localStorage.setItem('auth_token', data.token);
+                    // sesuaikan path redirect sesuai aplikasi Anda
+                    window.location.href = data.redirect || '/dashboard.html';
+                } else {
+                    msg.textContent = data.message || 'Gagal masuk. Periksa kredensial Anda.';
+                }
+            } catch(err){
+                msg.textContent = 'Terjadi kesalahan jaringan. Coba lagi.';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = prevText;
+            }
+        });
+    </script>
+</body>
+</html>
