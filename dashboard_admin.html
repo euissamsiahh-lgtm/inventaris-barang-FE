@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -96,11 +96,11 @@
     </div>
 
     <div class="top-cards">
-      <div class="stat-card"><span>Total Barang</span><strong>123</strong></div>
-      <div class="stat-card"><span>Total Stok</span><strong>900</strong></div>
-      <div class="stat-card"><span>Barang Masuk</span><strong>200</strong></div>
-      <div class="stat-card"><span>Barang Keluar</span><strong>130</strong></div>
-      <div class="stat-card"><span>Stok Minimum</span><strong>900</strong></div>
+      <div class="stat-card"><span>Total Barang</span><strong id="val-total-barang">...</strong></div>
+      <div class="stat-card"><span>Total Stok</span><strong id="val-total-stok">...</strong></div>
+      <div class="stat-card"><span>Barang Masuk</span><strong id="val-barang-masuk">...</strong></div>
+      <div class="stat-card"><span>Barang Keluar</span><strong id="val-barang-keluar">...</strong></div>
+      <div class="stat-card"><span>Stok Minimum</span><strong id="val-stok-minimum">...</strong></div>
     </div>
 
     <div class="layout">
@@ -126,17 +126,16 @@
 
       <div class="panel">
         <div class="small-panel">
-          <div class="small-card"><span>Masuk</span><strong>111</strong></div>
-          <div class="small-card"><span>Keluar</span><strong>111</strong></div>
-          <div class="small-card"><span>Total Mutasi</span><strong>111</strong></div>
+          <div class="small-card"><span>Masuk</span><strong id="val-mutasi-masuk">...</strong></div>
+          <div class="small-card"><span>Keluar</span><strong id="val-mutasi-keluar">...</strong></div>
+          <div class="small-card"><span>Total Mutasi</span><strong id="val-mutasi-total">...</strong></div>
         </div>
         <div class="list-card">
           <header style="margin-bottom:12px;"><h2>Stok Menipis</h2></header>
           <table class="table">
             <thead><tr><th>No</th><th>Nama Barang</th><th>Stok</th><th>Stok Minimum</th><th>Satuan</th></tr></thead>
-            <tbody>
-              <tr><td>1</td><td>Kertas A4</td><td>8</td><td>50</td><td>Rim</td></tr>
-              <tr><td>2</td><td>Kertas A4</td><td>8</td><td>50</td><td>Rim</td></tr>
+            <tbody id="table-stok-menipis">
+              <tr><td colspan="5" style="text-align: center; color: var(--muted)">Memuat data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -148,9 +147,8 @@
         <header><h2>Aktivitas Terbaru</h2></header>
         <table class="table" style="margin-top:12px">
           <thead><tr><th>No</th><th>Tanggal</th><th>Jenis</th><th>Nama Barang</th><th>Jumlah</th><th>Oleh</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>22/05/24</td><td>Masuk</td><td>Kertas A4</td><td>50</td><td>Petugas Gudang</td></tr>
-            <tr><td>2</td><td>22/05/24</td><td>Keluar</td><td>Kertas A4</td><td>50</td><td>Petugas Gudang</td></tr>
+          <tbody id="table-aktivitas">
+            <tr><td colspan="6" style="text-align: center; color: var(--muted)">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -173,5 +171,128 @@
       </div>
     </div>
   </div>
+  <script>
+    const API_BASE_URL = 'http://192.168.88.74/inventaris-barang-BE/public/api';
+    
+    // Gunakan access_token (berdasarkan API documentation) atau auth_token (berdasarkan script login)
+    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+
+    async function fetchDashboardData() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/dashboard`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 401) {
+                // Token invalid or expired
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('auth_token');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const result = await response.json();
+            if (response.ok) {
+                renderDashboard(result.data);
+            } else {
+                console.error('Gagal mengambil data:', result.message);
+            }
+        } catch (error) {
+            console.error('Terjadi kesalahan:', error);
+        }
+    }
+
+    function renderDashboard(data) {
+        // Summary
+        document.getElementById('val-total-barang').textContent = data.summary.total_jenis_barang;
+        document.getElementById('val-total-stok').textContent = data.summary.total_stok_keseluruhan;
+        document.getElementById('val-barang-masuk').textContent = data.summary.barang_masuk_bulan_ini;
+        document.getElementById('val-barang-keluar').textContent = data.summary.barang_keluar_bulan_ini;
+        document.getElementById('val-stok-minimum').textContent = data.summary.jumlah_barang_stok_minimum;
+
+        // Mutasi
+        document.getElementById('val-mutasi-masuk').textContent = data.mutasi.masuk;
+        document.getElementById('val-mutasi-keluar').textContent = data.mutasi.keluar;
+        document.getElementById('val-mutasi-total').textContent = data.mutasi.total_mutasi;
+
+        // Stok Menipis
+        const tbodyStok = document.getElementById('table-stok-menipis');
+        tbodyStok.innerHTML = '';
+        if (data.stok_menipis.length === 0) {
+            tbodyStok.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--muted)">Tidak ada stok menipis</td></tr>';
+        } else {
+            data.stok_menipis.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.nama_barang}</td>
+                    <td>${item.stok}</td>
+                    <td>${item.stok_minimum}</td>
+                    <td>${item.satuan}</td>
+                `;
+                tbodyStok.appendChild(tr);
+            });
+        }
+
+        // Aktivitas Terbaru
+        const tbodyAktivitas = document.getElementById('table-aktivitas');
+        tbodyAktivitas.innerHTML = '';
+        if (data.aktivitas_terbaru.length === 0) {
+            tbodyAktivitas.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--muted)">Tidak ada aktivitas</td></tr>';
+        } else {
+            data.aktivitas_terbaru.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.tanggal}</td>
+                    <td>${item.jenis}</td>
+                    <td>${item.nama_barang}</td>
+                    <td>${item.jumlah}</td>
+                    <td>${item.oleh}</td>
+                `;
+                tbodyAktivitas.appendChild(tr);
+            });
+        }
+
+        // Graph Stat Row Update
+        if (data.grafik_30_hari && data.grafik_30_hari.labels) {
+            const statRow = document.querySelector('.stat-row');
+            if (statRow) {
+                statRow.innerHTML = '';
+                const len = data.grafik_30_hari.labels.length;
+                const showCount = Math.min(3, len);
+                for(let i = len - showCount; i < len; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'item';
+                    const masuk = data.grafik_30_hari.data_masuk[i] || 0;
+                    div.innerHTML = `<span>${data.grafik_30_hari.labels[i]}</span><strong>${masuk} Masuk</strong>`;
+                    statRow.appendChild(div);
+                }
+            }
+        }
+
+        // Pie Chart Update
+        const pieBox = document.querySelector('.pie-box');
+        if(pieBox) {
+            const labels = pieBox.querySelectorAll('.legend-item');
+            if(labels.length >= 4) {
+                labels[0].innerHTML = `<span class="legend-dot legend-1"></span>Barang Masuk (${data.summary.barang_masuk_bulan_ini})`;
+                labels[1].innerHTML = `<span class="legend-dot legend-2"></span>Stok Tersedia (${data.summary.total_stok_keseluruhan})`;
+                labels[2].innerHTML = `<span class="legend-dot legend-3"></span>Barang Keluar (${data.summary.barang_keluar_bulan_ini})`;
+                labels[3].innerHTML = `<span class="legend-dot legend-4"></span>Stok Minimum (${data.summary.jumlah_barang_stok_minimum})`;
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchDashboardData);
+  </script>
 </body>
 </html>

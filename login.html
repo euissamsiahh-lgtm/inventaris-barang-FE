@@ -122,7 +122,7 @@
 
     <script>
         // Config: ganti URL ini dengan URL endpoint backend Anda
-        const API_URL = 'http://localhost:8000/api/auth/login';
+        const API_URL = 'http://192.168.88.74/inventaris-barang-BE/public/api/login';
 
         function togglePassword(){
             const p = document.getElementById('password');
@@ -162,9 +162,13 @@
 
                 if(res.ok){
                     // contoh menyimpan token dan redirect
-                    if(data.token) localStorage.setItem('auth_token', data.token);
-                    // sesuaikan path redirect sesuai aplikasi Anda
-                    window.location.href = data.redirect || '/dashboard.html';
+                    if(data.access_token) {
+                        localStorage.setItem('access_token', data.access_token);
+                    } else if(data.token) {
+                        localStorage.setItem('auth_token', data.token);
+                    }
+                    // sesuaikan path redirect
+                    window.location.href = 'dashboard_admin.html';
                 } else {
                     msg.textContent = data.message || 'Gagal masuk. Periksa kredensial Anda.';
                 }
