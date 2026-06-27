@@ -4,132 +4,405 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>STOK.KU — Masuk</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{
-            --navy:#243254;
-            --navy-dark:#0f2340;
-            --muted:#7b8699;
-            --accent:#0d2547;
-            --border:#d9d9df;
-            --radius:10px;
-            --glass: rgba(255,255,255,0.04);
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        :root {
+            --left-bg: #313f57; /* Dark navy from design */
+            --right-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --btn-dark: #07101f; /* Very dark blue/black for button */
+            --border: #cbd5e1;
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
         }
-        *{box-sizing:border-box}
-        body,html{height:100%;margin:0;background:#f7f8fb;color:#111}
-        .split{min-height:100vh;display:flex}
-        .left{
-            flex:1.1;background:linear-gradient(180deg,var(--navy),#2e3f60);color:#fff;padding:64px 56px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:28px;
+        * { box-sizing: border-box; }
+        body, html {
+            height: 100%; margin: 0; font-family: var(--font);
+            background: var(--right-bg);
         }
-        .brand{display:flex;flex-direction:column;gap:18px}
-        .logo{
-            display:flex;align-items:center;gap:14px
+        
+        .split {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
         }
-        .cube{
-            width:56px;height:56px;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,0.06)
+
+        /* --- Left Side --- */
+        .left {
+            flex: 0 0 45%;
+            background-color: var(--left-bg);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Start from top */
+            position: relative;
+            overflow: hidden;
+            padding: 40px;
         }
-        .cube svg{width:36px;height:36px;opacity:0.95}
-        .brand h1{font-size:28px;margin:0;letter-spacing:1px}
-        .brand p{max-width:320px;margin:0;color:rgba(255,255,255,0.85);line-height:1.5}
-        .illustration{margin-top:12px;opacity:0.95}
+        
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            z-index: 10;
+            margin-top: 8vh; /* Shifted higher so it doesn't get covered by the boxes */
+        }
+        
+        .cube-icon {
+            width: 72px;
+            height: 72px;
+            margin-bottom: 20px;
+        }
+        
+        .brand-title {
+            font-size: 36px;
+            font-weight: 500;
+            margin: 0;
+            letter-spacing: 1.5px;
+            font-family: 'Times New Roman', Times, serif; 
+        }
+        
+        .brand-line {
+            width: 100%;
+            max-width: 240px; /* Shorter line like the design */
+            height: 2px;
+            background-color: #fff;
+            margin: 20px 0 24px 0;
+            border: none;
+        }
+        
+        .brand-desc {
+            max-width: 380px;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+            font-weight: 400;
+            color: #e2e8f0;
+        }
 
-        .right{flex:1;padding:48px 64px;display:flex;align-items:center;justify-content:center}
-        .card{width:100%;max-width:420px;background:#fff;border-radius:12px;padding:36px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(16,24,40,0.06)}
-        .card h2{margin:0 0 6px 0;color:var(--navy-dark);font-weight:700}
-        .card p.lead{margin:0 0 22px 0;color:var(--muted)}
+        /* --- Illustrations --- */
+        .illust-warehouse {
+            position: absolute;
+            bottom: 0;
+            right: -20px; /* Aligned to right edge */
+            left: auto;
+            width: 85%; /* Doesn't span full width */
+            max-width: 500px;
+            height: auto;
+            object-fit: cover;
+            object-position: bottom right;
+            opacity: 0.25; /* Darken/blend into background */
+            mix-blend-mode: multiply; /* Helps it blend perfectly */
+            z-index: 1;
+        }
+        
+        .illust-boxes {
+            position: absolute;
+            bottom: 15px; /* Lowered closer to the bottom */
+            left: 30px;
+            width: 70%;
+            max-width: 280px; /* Slightly smaller to ensure text is visible */
+            z-index: 2;
+        }
 
-        .field{display:flex;flex-direction:column;margin-bottom:16px}
-        label{font-size:13px;margin-bottom:8px;color:var(--navy-dark);font-weight:600}
-        input[type="email"],input[type="password"]{height:44px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);outline:none;font-size:14px}
-        .password-wrap{position:relative}
-        .toggle-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted)}
+        /* --- Right Side --- */
+        .right {
+            flex: 1;
+            background: var(--right-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .form-container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .form-header h2 {
+            margin: 0 0 10px 0;
+            color: var(--text-main);
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .form-header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
 
-        .forgot{font-size:13px;color:var(--muted);text-align:right;margin-top:6px}
-        .btn{display:inline-block;width:100%;padding:12px;border-radius:8px;border:0;background:var(--accent);color:#fff;font-weight:700;margin-top:12px;cursor:pointer}
-        .btn.secondary{background:#fff;color:var(--navy);border:1px solid var(--border)}
+        .field {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .field label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+        .field input {
+            height: 48px;
+            padding: 0 16px;
+            border-radius: 8px;
+            border: 1px solid var(--text-main); /* Darker border like the design */
+            font-size: 14px;
+            outline: none;
+            color: var(--text-main);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus {
+            border-color: var(--left-bg);
+            box-shadow: 0 0 0 3px rgba(49, 63, 87, 0.1);
+        }
+        
+        .password-wrap {
+            position: relative;
+        }
+        .password-wrap input {
+            width: 100%;
+            padding-right: 48px;
+        }
+        .toggle-eye {
+            position: absolute;
+            right: 16px;
+            top: 15px; /* Vertically centered in the 48px input */
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-main);
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .divider{display:flex;align-items:center;gap:12px;margin:18px 0}
-        .divider hr{flex:1;border:none;border-top:1px solid var(--border);margin:0}
-        .or{font-size:13px;color:var(--muted)}
+        .forgot-link {
+            text-align: right;
+            margin-top: 8px;
+        }
+        .forgot-link a {
+            font-size: 13px;
+            color: var(--left-bg);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
 
-        .small-line{height:2px;background:rgba(0,0,0,0.06);margin:18px 0}
+        .btn {
+            height: 48px;
+            width: 100%;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, opacity 0.2s;
+        }
+        .btn-primary {
+            background-color: var(--btn-dark);
+            color: #fff;
+            margin-top: 16px;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 32px 0;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .divider:not(:empty)::before { margin-right: 16px; }
+        .divider:not(:empty)::after { margin-left: 16px; }
 
-        @media (max-width:900px){
-            .split{flex-direction:column}
-            .left{padding:36px;text-align:center;align-items:center}
-            .right{padding:36px}
+        .btn-secondary {
+            background-color: #fff;
+            color: var(--btn-dark);
+            border: 1px solid var(--btn-dark);
+        }
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+        }
+
+        /* --- Toast Notifications --- */
+        .toast {
+            position: fixed; top: 24px; right: 24px; z-index: 9999;
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 18px; border-radius: 10px;
+            font-size: 14px; font-weight: 600;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+            opacity: 0; transform: translateY(-16px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none; min-width: 260px; max-width: 360px;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .toast.error { background: #fff1f1; color: #b91c1c; border: 1px solid #fecaca; }
+        .toast.warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+        .toast.success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .toast-icon { flex-shrink: 0; width: 20px; height: 20px; }
+        .toast-close { margin-left: auto; background: none; border: none; cursor: pointer; padding: 0; color: inherit; opacity: 0.6; }
+        .toast-close:hover { opacity: 1; }
+
+        .input-error { border-color: #ef4444 !important; }
+
+        @media (max-width: 900px) {
+            .split { flex-direction: column; }
+            .left { min-height: 600px; padding-bottom: 250px; }
+            .brand-container { margin-top: 0; }
+            .right { padding: 40px 20px; }
         }
     </style>
 </head>
 <body>
     <div class="split">
+        <!-- Bagian Kiri -->
         <aside class="left">
-            <div class="brand">
-                <div class="logo">
-                    <div class="cube" aria-hidden>
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L20 6v8l-8 4-8-4V6l8-4z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M12 22v-10" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h1>STOK.KU</h1>
-                        <hr style="width:56px;border-color:rgba(255,255,255,0.16);border-top-width:2px;margin:6px 0">
-                    </div>
-                </div>
-                <p>Kelola data barang, stok, barang masuk dan barang keluar dengan mudah dan terorganisir</p>
+            <div class="brand-container">
+                <svg class="cube-icon" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                
+                <h1 class="brand-title">STOK.KU</h1>
+                <hr class="brand-line">
+                <p class="brand-desc">Kelola data barang, stok, barang masuk dan barang keluar dengan mudah dan terorganisir</p>
             </div>
 
-            <div class="illustration" aria-hidden>
-                <!-- Placeholder boxes illustration -->
-                <svg width="220" height="140" viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="8" y="48" width="64" height="48" rx="6" fill="#f9c66a"/>
-                    <rect x="84" y="30" width="90" height="70" rx="6" fill="#ffd88a"/>
-                    <rect x="16" y="18" width="40" height="28" rx="4" fill="#fff" opacity="0.08"/>
-                </svg>
-            </div>
+            <!-- Ilustrasi -->
+            <img src="img_warehouse_trans.png" alt="Warehouse Background" class="illust-warehouse" aria-hidden="true">
+            <img src="img_boxes_clipboard_trans.png" alt="Boxes and Clipboard" class="illust-boxes" aria-hidden="true">
         </aside>
 
+        <!-- Bagian Kanan -->
         <main class="right">
-            <div class="card" role="main">
-                <h2>Masuk</h2>
-                <p class="lead">Silakan masuk untuk melanjutkan</p>
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Masuk</h2>
+                    <p>Silakan masuk untuk melanjutkan</p>
+                </div>
 
                 <form id="loginForm">
                     <div class="field">
                         <label for="email">Email</label>
-                        <input id="email" type="email" placeholder="Masukkan Email" required>
+                        <input id="email" type="email" placeholder="Masukan Email" required>
                     </div>
 
-                    <div class="field password-wrap">
+                    <div class="field">
                         <label for="password">Kata Sandi</label>
-                        <input id="password" type="password" placeholder="Masukkan Kata Sandi" required>
-                        <button type="button" class="toggle-eye" aria-label="Tampilkan kata sandi" onclick="togglePassword()">👁️</button>
-                        <div class="forgot"><a href="#" style="color:var(--muted);text-decoration:none">Lupa Kata Sandi?</a></div>
+                        <div class="password-wrap">
+                            <input id="password" type="password" placeholder="Masukan Kata Sandi" required>
+                            <button type="button" class="toggle-eye" id="eyeBtn" aria-label="Tampilkan kata sandi" onclick="togglePassword()">
+                                <!-- Eye Open Icon -->
+                                <svg id="iconEye" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <!-- Eye Off Icon -->
+                                <svg id="iconEyeOff" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="forgot-link">
+                            <a href="#">Lupa Kata Sandi?</a>
+                        </div>
                     </div>
 
-                      <button class="btn" type="submit" id="submitBtn">Masuk</button>
+                    <button class="btn btn-primary" type="submit" id="submitBtn">Masuk</button>
 
-                    <div class="divider"><hr><div class="or">Atau</div><hr></div>
+                    <div class="divider">Atau</div>
 
-                    <button type="button" class="btn secondary">Masuk Sebagai Petugas</button>
-                    <div id="msg" aria-live="polite" style="margin-top:12px;color:#b00020;font-size:13px"></div>
+                    <button type="button" class="btn btn-secondary">Masuk Sebagai Petugas</button>
                 </form>
             </div>
         </main>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" role="alert" aria-live="assertive">
+        <svg class="toast-icon" id="toastIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        <span id="toastMsg"></span>
+        <button class="toast-close" onclick="hideToast()" aria-label="Tutup">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
     <script>
-        // Config: ganti URL ini dengan URL endpoint backend Anda
         const API_URL = 'http://192.168.88.74/inventaris-barang-BE/public/api/login';
+        let toastTimer;
+
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            const icons = {
+                error: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+                warning: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+                success: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
+            };
+
+            toastIcon.innerHTML = icons[type] || icons.error;
+            toastMsg.textContent = message;
+            toast.className = `toast ${type}`;
+
+            requestAnimationFrame(() => { toast.classList.add('show'); });
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(hideToast, 4000);
+        }
+
+        function hideToast() {
+            document.getElementById('toast').classList.remove('show');
+        }
+
+        function setInputError(id, isError) {
+            const el = document.getElementById(id);
+            if (isError) el.classList.add('input-error');
+            else el.classList.remove('input-error');
+        }
 
         function togglePassword(){
             const p = document.getElementById('password');
-            if(p.type === 'password'){
+            const iconEye = document.getElementById('iconEye');
+            const iconEyeOff = document.getElementById('iconEyeOff');
+            
+            if (p.type === 'password') {
                 p.type = 'text';
+                iconEye.style.display = 'none';
+                iconEyeOff.style.display = 'block';
             } else {
                 p.type = 'password';
+                iconEye.style.display = 'block';
+                iconEyeOff.style.display = 'none';
             }
         }
 
@@ -137,21 +410,23 @@
             e.preventDefault();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const msg = document.getElementById('msg');
             const submitBtn = document.getElementById('submitBtn');
 
-            msg.textContent = '';
+            setInputError('email', false);
+            setInputError('password', false);
+
             if(!email || !password){
-                msg.textContent = 'Email dan kata sandi wajib diisi.';
+                if (!email) setInputError('email', true);
+                if (!password) setInputError('password', true);
+                showToast('Email dan kata sandi wajib diisi.', 'warning');
                 return;
             }
 
-            // UI state
             submitBtn.disabled = true;
             const prevText = submitBtn.textContent;
             submitBtn.textContent = 'Memproses...';
 
-            try{
+            try {
                 const res = await fetch(API_URL, {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
@@ -160,20 +435,19 @@
 
                 const data = await res.json().catch(()=>({}));
 
-                if(res.ok){
-                    // contoh menyimpan token dan redirect
-                    if(data.access_token) {
-                        localStorage.setItem('access_token', data.access_token);
-                    } else if(data.token) {
-                        localStorage.setItem('auth_token', data.token);
-                    }
-                    // sesuaikan path redirect
-                    window.location.href = 'dashboard_admin.html';
+                if (res.ok) {
+                    if (data.access_token) localStorage.setItem('access_token', data.access_token);
+                    else if (data.token) localStorage.setItem('auth_token', data.token);
+                    
+                    showToast('Login berhasil! Mengalihkan...', 'success');
+                    setTimeout(() => { window.location.href = 'dashboard_admin.html'; }, 800);
                 } else {
-                    msg.textContent = data.message || 'Gagal masuk. Periksa kredensial Anda.';
+                    setInputError('email', true);
+                    setInputError('password', true);
+                    showToast(data.message || 'Email atau kata sandi salah!', 'error');
                 }
-            } catch(err){
-                msg.textContent = 'Terjadi kesalahan jaringan. Coba lagi.';
+            } catch (err) {
+                showToast('Terjadi kesalahan jaringan. Coba lagi.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = prevText;
