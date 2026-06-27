@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Stok Pegawai - STOK.KU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #fff;
+      --surface-strong: #0a1428;
+      --text: #111827;
+      --muted: #64748b;
+      --border: #0a1428;
+      --border-light: #e2e8f0;
+      --accent: #0a1428;
+      --radius: 8px;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+
+    /* Topbar */
+    .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: var(--surface); border-bottom: 1px solid var(--border-light); }
+    .menu-icon { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+    .menu-icon span { display: block; width: 24px; height: 2px; background: var(--accent); }
+    .profile-section { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .profile-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--accent); display: grid; place-items: center; }
+    .profile-avatar svg { width: 18px; height: 18px; fill: var(--accent); }
+    .profile-name { font-weight: 500; font-size: 14px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+
+    /* Sidebar */
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);opacity:0;visibility:hidden;transition:0.3s;z-index:998}
+    .sidebar-overlay.show{opacity:1;visibility:visible}
+    .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:#051428;box-shadow:4px 0 24px rgba(0,0,0,0.2);transform:translateX(-100%);transition:0.3s;z-index:999;display:flex;flex-direction:column;color:#fff}
+    .sidebar.show{transform:translateX(0)}
+    .sidebar-header{background:#4b5a75;padding:20px 24px;display:flex;align-items:center;gap:16px;}
+    .sidebar-header h2{margin:0;font-size:20px;color:#fff;letter-spacing:1px;flex:1;}
+    .close-btn{background:none;border:none;cursor:pointer;color:#fff;display:flex;align-items:center;padding:0;}
+    .sidebar-nav{padding:16px 0;display:flex;flex-direction:column;flex:1;overflow-y:auto;}
+    .sidebar-section-title{font-size:12px;font-weight:600;color:#94a3b8;letter-spacing:0.5px;margin:16px 24px 8px 32px;text-transform:uppercase;}
+    .nav-link{padding:12px 32px;text-decoration:none;color:#e2e8f0;font-size:14px;font-weight:600;transition:0.2s;display:flex;align-items:center;gap:12px;}
+    .nav-link:hover{background:rgba(255,255,255,0.08);color:#fff;}
+    .nav-link.active{background:#64748b;color:#fff;}
+    .sidebar-divider{height:1px;background:rgba(255,255,255,0.2);border:none;margin:12px 24px;}
+    .sidebar-footer{padding:0 0 24px 0;}
+    .logout-link{padding-left:32px;margin-top:12px;display:flex;align-items:center;gap:12px;color:#e2e8f0;text-decoration:none;font-weight:600;}
+
+    /* Page */
+    .page { padding: 26px 32px; max-width: 1280px; margin: 0 auto; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 24px; font-weight: 700; margin: 0; color: #000; }
+
+    /* Filter Card */
+    .filter-card { background: var(--surface); border: 1.5px solid var(--accent); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 24px; }
+    .filter-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #000; margin-bottom: 16px; }
+    
+    .filter-grid { display: flex; gap: 20px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-item { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
+    .filter-item label { font-size: 13px; font-weight: 600; color: #000; }
+    .filter-input { padding: 10px 12px; border: 1.5px solid var(--accent); border-radius: 4px; font-size: 13px; font-weight: 500; font-family: inherit; color: var(--text); outline: none; }
+    .filter-input::placeholder { color: #9ca3af; }
+    
+    .filter-actions { display: flex; gap: 12px; }
+    .btn-reset { background: #fff; border: 1.5px solid var(--accent); color: var(--accent); padding: 10px 24px; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-reset:hover { background: #f1f5f9; }
+    .btn-show { background: var(--surface-strong); border: 1.5px solid var(--surface-strong); color: #fff; padding: 10px 24px; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-show:hover { opacity: 0.9; }
+
+    .radio-group { display: flex; gap: 24px; align-items: center; }
+    .radio-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #000; cursor: pointer; }
+    .radio-item input[type="radio"] { appearance: none; width: 16px; height: 16px; border: 1.5px solid var(--accent); border-radius: 50%; outline: none; cursor: pointer; position: relative; }
+    .radio-item input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 7px; height: 7px; background: var(--accent); border-radius: 50%; }
+
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-box { background: var(--surface-strong); border-radius: var(--radius); padding: 20px 24px; display: flex; align-items: center; gap: 16px; color: #fff; }
+    .stat-icon { width: 44px; height: 44px; display: grid; place-items: center; flex-shrink: 0; }
+    .stat-icon svg { width: 36px; height: 36px; stroke: #fff; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .stat-info span { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85); display: block; }
+    .stat-info strong { font-size: 28px; font-weight: 700; line-height: 1.2; display: block; }
+
+    /* Table Section */
+    .table-card { background: var(--surface); border: 1.5px solid var(--accent); border-radius: var(--radius); padding: 20px 24px; overflow-x: auto; }
+    .table-title { text-align: center; font-size: 16px; font-weight: 700; margin: 0 0 20px 0; color: #000; }
+    .table { width: 100%; border-collapse: collapse; text-align: center; }
+    .table th { font-weight: 600; font-size: 13px; color: #000; padding: 12px 10px; border-bottom: 2px solid var(--accent); }
+    .table td { font-size: 13px; padding: 14px 10px; border-bottom: 1px solid var(--border-light); font-weight: 500; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Badges */
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; border: 1px solid currentColor; }
+    .badge-aman { background: #bbf7d0; color: #166534; }
+    .badge-habis { background: #fecaca; color: #991b1b; }
+    .badge-hampir { background: #fef08a; color: #854d0e; }
+
+    @media (max-width: 900px) {
+      .filter-grid { flex-direction: column; align-items: stretch; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .radio-group { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Overlay & Menu -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <button class="close-btn" id="closeSidebar" aria-label="Tutup Menu">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h2>STOK.KU</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-title">Menu</div>
+      <a href="dashboard_petugas.html" class="nav-link">Dashboard</a>
+      
+      <div class="sidebar-section-title">Transaksi</div>
+      <a href="#" class="nav-link">Barang Masuk</a>
+      <a href="#" class="nav-link">Barang Keluar</a>
+      
+      <div class="sidebar-section-title">Laporan</div>
+      <a href="#" class="nav-link">Laporan Barang Masuk</a>
+      <a href="#" class="nav-link">Laporan Barang Keluar</a>
+      <a href="laporan_stok_petugas.html" class="nav-link active">Laporan Stok</a>
+    </nav>
+    <div class="sidebar-footer">
+      <hr class="sidebar-divider">
+      <a href="#" class="logout-link" onclick="logout()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Keluar
+      </a>
+    </div>
+  </div>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="menu-icon" id="menuToggle">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="profile-section">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+      <div class="profile-name">
+        Petugas Gudang
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="page-header">
+      <h1>Laporan Stok</h1>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="filter-card">
+      <div class="filter-title">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        Filter Kategori
+      </div>
+
+      <div class="filter-grid">
+        <div class="filter-item">
+          <label>Kategori</label>
+          <input type="text" class="filter-input" id="filterKategori" placeholder="Masukkan Nama Kategori">
+        </div>
+        <div class="filter-item">
+          <label>Nama Barang</label>
+          <input type="text" class="filter-input" id="filterNama" placeholder="Masukkan Nama Barang">
+        </div>
+        <div class="filter-item">
+          <label>Kode Barang</label>
+          <input type="text" class="filter-input" id="filterKode" placeholder="Masukkan Kode Barang">
+        </div>
+        <div class="filter-actions">
+          <button class="btn-reset" id="btnReset">Reset</button>
+          <button class="btn-show" id="btnFilter">Tampilkan</button>
+        </div>
+      </div>
+
+      <div class="filter-item">
+        <label style="margin-bottom:8px; display:block;">Tampilkan Stok</label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="stokRadio" value="semua" checked>
+            Semua
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="stokRadio" value="lebih_dari_10">
+            Stok > 10
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="stokRadio" value="nol">
+            Stok = 0
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <div class="stat-info"><span>Total Barang</span><strong id="valTotalBarang">...</strong></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 2 17 12 22 22 17 22 7 12 2"/><polyline points="2 7 12 12 22 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+        </div>
+        <div class="stat-info"><span>Total Stok</span><strong id="valTotalStok">...</strong></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/></svg>
+        </div>
+        <div class="stat-info"><span>Barang Masuk</span><strong id="valBarangMasuk">...</strong></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><line x1="17" y1="17" x2="7" y2="7"/><polyline points="7 17 7 7 17 7"/></svg>
+        </div>
+        <div class="stat-info"><span>Barang Keluar</span><strong id="valBarangKeluar">...</strong></div>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-card">
+      <h2 class="table-title">Daftar Stok Barang</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Kode Barang</th>
+            <th>Nama Barang</th>
+            <th>Kategori</th>
+            <th>Satuan</th>
+            <th>Stok Tersedia</th>
+            <th>Stok Minimal</th>
+            <th>Harga Satuan</th>
+            <th>Harga Stok</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="10" style="text-align: center; color: var(--muted); padding: 32px 0;">Memuat data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    const API_BASE = 'http://192.168.1.71/inventaris-barang-BE/public/api';
+    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+    if (!token) window.location.href = 'login.html';
+
+    const headers = { 'Accept': 'application/json', 'Authorization': `Bearer ${token}` };
+
+    // Sidebar
+    const menuBtn = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const closeBtn = document.getElementById('closeSidebar');
+    if(menuBtn) menuBtn.addEventListener('click', () => { sidebar.classList.add('show'); overlay.classList.add('show'); });
+    const closeMenu = () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); };
+    if(closeBtn) closeBtn.addEventListener('click', closeMenu);
+    if(overlay) overlay.addEventListener('click', closeMenu);
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_role');
+      window.location.href = 'login.html';
+    }
+
+    // Logic Laporan Stok
+    const btnFilter = document.getElementById('btnFilter');
+    const btnReset = document.getElementById('btnReset');
+    const tableBody = document.getElementById('tableBody');
+
+    function formatRupiah(angka) {
+      if(!angka) return '0';
+      return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    async function fetchLaporan() {
+      tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 32px 0;">Memuat data...</td></tr>';
+      
+      const params = new URLSearchParams();
+      // These fields act as local filters or API filters depending on API capability.
+      // Usually API endpoints accept category, barang_id, etc. If the API doesn't support text search directly, 
+      // we'll filter on frontend, but typically we send them if possible.
+      
+      try {
+        // We'll fetch all laporan first
+        const res = await fetch(`${API_BASE}/laporan/stok`, { headers });
+        if (res.status === 401) { logout(); return; }
+        const data = await res.json();
+        
+        if (res.ok) {
+          updateUI(data.data);
+        } else {
+          tableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: red; padding: 32px 0;">Gagal: ${data.message}</td></tr>`;
+        }
+      } catch (err) {
+        tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: red; padding: 32px 0;">Terjadi kesalahan jaringan</td></tr>';
+      }
+    }
+
+    function updateUI(data) {
+      // Get filter values for local filtering
+      const filterKat = document.getElementById('filterKategori').value.toLowerCase();
+      const filterNama = document.getElementById('filterNama').value.toLowerCase();
+      const filterKode = document.getElementById('filterKode').value.toLowerCase();
+      const stokRadio = document.querySelector('input[name="stokRadio"]:checked').value;
+
+      // Update Stats (Global)
+      document.getElementById('valTotalBarang').textContent = data.summary?.total_barang ?? '-';
+      document.getElementById('valTotalStok').textContent = data.summary?.total_stok ?? '-';
+      document.getElementById('valBarangMasuk').textContent = data.summary?.barang_masuk ?? '-';
+      document.getElementById('valBarangKeluar').textContent = data.summary?.barang_keluar ?? '-';
+
+      let list = data.laporan || [];
+
+      // Apply Local Filters
+      list = list.filter(item => {
+        if (filterKat && !(item.kategori || '').toLowerCase().includes(filterKat)) return false;
+        if (filterNama && !(item.nama_barang || '').toLowerCase().includes(filterNama)) return false;
+        if (filterKode && !(item.kode_barang || '').toLowerCase().includes(filterKode)) return false;
+        
+        if (stokRadio === 'lebih_dari_10' && parseInt(item.stok_tersedia) <= 10) return false;
+        if (stokRadio === 'nol' && parseInt(item.stok_tersedia) !== 0) return false;
+        
+        return true;
+      });
+
+      tableBody.innerHTML = '';
+      if(list.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 32px 0;">Tidak ada data ditemukan</td></tr>';
+        return;
+      }
+
+      list.forEach((item, idx) => {
+        let badgeClass = '';
+        if (item.status === 'Aman') badgeClass = 'badge-aman';
+        else if (item.status === 'Hampir Habis') badgeClass = 'badge-hampir';
+        else if (item.status === 'Habis') badgeClass = 'badge-habis';
+        else badgeClass = 'badge-aman'; // default
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td>${item.kode_barang || '-'}</td>
+          <td>${item.nama_barang || '-'}</td>
+          <td>${item.kategori || '-'}</td>
+          <td>${item.satuan || '-'}</td>
+          <td>${item.stok_tersedia || 0}</td>
+          <td>${item.stok_minimum || 0}</td>
+          <td>Rp ${formatRupiah(item.harga_satuan)}</td>
+          <td>Rp ${formatRupiah(item.harga_stok)}</td>
+          <td><span class="badge ${badgeClass}">${item.status || 'Aman'}</span></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    btnFilter.addEventListener('click', fetchLaporan);
+    btnReset.addEventListener('click', () => {
+      document.getElementById('filterKategori').value = '';
+      document.getElementById('filterNama').value = '';
+      document.getElementById('filterKode').value = '';
+      document.querySelector('input[name="stokRadio"][value="semua"]').checked = true;
+      fetchLaporan();
+    });
+
+    document.addEventListener('DOMContentLoaded', fetchLaporan);
+  </script>
+</body>
+</html>

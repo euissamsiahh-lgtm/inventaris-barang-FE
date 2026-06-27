@@ -35,16 +35,17 @@
     .sidebar-overlay.show{opacity:1;visibility:visible}
     .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:#051428;box-shadow:4px 0 24px rgba(0,0,0,0.2);transform:translateX(-100%);transition:0.3s;z-index:999;display:flex;flex-direction:column;color:#fff}
     .sidebar.show{transform:translateX(0)}
-    .sidebar-header{background:#4b5a75;padding:20px 24px;display:flex;justify-content:space-between;align-items:center}
-    .sidebar-header h2{margin:0;font-size:20px;color:#fff;letter-spacing:1px;text-align:center;flex:1}
-    .close-btn{background:none;border:none;cursor:pointer;color:#fff;display:flex;align-items:center;padding:0}
-    .sidebar-nav{padding:16px 0;display:flex;flex-direction:column;flex:1;overflow-y:auto}
-    .nav-link{padding:12px 32px;text-decoration:none;color:#e2e8f0;font-size:14px;font-weight:600;transition:0.2s;display:flex;align-items:center;gap:12px}
-    .nav-link:hover{background:rgba(255,255,255,0.08);color:#fff}
-    .nav-link.active{background:rgba(255,255,255,0.15);color:#fff;border-left:3px solid transparent}
-    .sidebar-divider{height:1px;background:rgba(255,255,255,0.15);border:none;margin:12px 24px}
-    .sidebar-footer{padding:0 0 24px 0}
-    .logout-link{justify-content:center;margin-top:12px}
+    .sidebar-header{background:#4b5a75;padding:20px 24px;display:flex;align-items:center;gap:16px;}
+    .sidebar-header h2{margin:0;font-size:20px;color:#fff;letter-spacing:1px;flex:1;}
+    .close-btn{background:none;border:none;cursor:pointer;color:#fff;display:flex;align-items:center;padding:0;}
+    .sidebar-nav{padding:16px 0;display:flex;flex-direction:column;flex:1;overflow-y:auto;}
+    .sidebar-section-title{font-size:12px;font-weight:600;color:#94a3b8;letter-spacing:0.5px;margin:16px 24px 8px 32px;text-transform:uppercase;}
+    .nav-link{padding:12px 32px;text-decoration:none;color:#e2e8f0;font-size:14px;font-weight:600;transition:0.2s;display:flex;align-items:center;gap:12px;}
+    .nav-link:hover{background:rgba(255,255,255,0.08);color:#fff;}
+    .nav-link.active{background:#64748b;color:#fff;}
+    .sidebar-divider{height:1px;background:rgba(255,255,255,0.2);border:none;margin:12px 24px;}
+    .sidebar-footer{padding:0 0 24px 0;}
+    .logout-link{padding-left:32px;margin-top:12px;display:flex;align-items:center;gap:12px;color:#e2e8f0;text-decoration:none;font-weight:600;}
 
     /* Page */
     .page { padding: 26px 32px; max-width: 1280px; margin: 0 auto; }
@@ -112,20 +113,27 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <button class="close-btn" id="closeSidebar">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+      <button class="close-btn" id="closeSidebar" aria-label="Tutup Menu">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h2>STOK.KU</h2>
-      <div style="width:20px"></div>
     </div>
     <nav class="sidebar-nav">
+      <div class="sidebar-section-title">Menu</div>
       <a href="dashboard_petugas.html" class="nav-link active">Dashboard</a>
-      <a href="laporan_barang_masuk_admin.html" class="nav-link">Laporan Barang Masuk</a>
-      <a href="laporan_bk_admin.html" class="nav-link">Laporan Barang Keluar</a>
+      
+      <div class="sidebar-section-title">Transaksi</div>
+      <a href="#" class="nav-link">Barang Masuk</a>
+      <a href="#" class="nav-link">Barang Keluar</a>
+      
+      <div class="sidebar-section-title">Laporan</div>
+      <a href="#" class="nav-link">Laporan Barang Masuk</a>
+      <a href="#" class="nav-link">Laporan Barang Keluar</a>
+      <a href="laporan_stok_petugas.html" class="nav-link">Laporan Stok</a>
     </nav>
     <div class="sidebar-footer">
       <hr class="sidebar-divider">
-      <a href="#" class="nav-link logout-link" onclick="logout()">
+      <a href="#" class="logout-link" onclick="logout()">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
         Keluar
       </a>
