@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Barang Keluar - STOK.KU</title>
+  <title>Barang Masuk - STOK.KU</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -120,8 +120,8 @@
       <a href="dashboard_petugas.html" class="nav-link">Dashboard</a>
       
       <div class="sidebar-section-title">Transaksi</div>
-      <a href="BM_petugas.html" class="nav-link">Barang Masuk</a>
-      <a href="BK_Petugas.html" class="nav-link active">Barang Keluar</a>
+      <a href="BM_petugas.html" class="nav-link active">Barang Masuk</a>
+      <a href="BK_Petugas.html" class="nav-link">Barang Keluar</a>
       
       <div class="sidebar-section-title">Laporan</div>
       <a href="laporan_BM_petugas.html" class="nav-link">Laporan Barang Masuk</a>
@@ -154,11 +154,11 @@
   </div>
 
   <div class="page">
-    <h1 class="page-title">Barang Keluar</h1>
+    <h1 class="page-title">Barang Masuk</h1>
 
     <!-- Input Panel -->
     <div class="panel">
-      <h2 class="panel-title">Input Barang Keluar</h2>
+      <h2 class="panel-title">Input Barang Masuk</h2>
       
       <div class="form-group">
         <label>Tanggal</label>
@@ -197,9 +197,9 @@
       </div>
 
       <div class="form-group">
-        <label>Tujuan</label>
+        <label>Supplier</label>
         <div class="form-control-wrap">
-          <input type="text" class="form-input" id="inputTujuan" placeholder="Masukan Tujuan">
+          <input type="text" class="form-input" id="inputSupplier" placeholder="Masukan Nama Supplier">
         </div>
       </div>
 
@@ -223,14 +223,14 @@
 
     <!-- Table Panel -->
     <div class="table-panel">
-      <h2 class="table-title">Daftar Barang Keluar</h2>
+      <h2 class="table-title">Daftar Barang Masuk</h2>
       <table class="table">
         <thead>
           <tr>
             <th>No</th>
-            <th>Tanggal Keluar</th>
+            <th>Tanggal Masuk</th>
             <th>No. Referensi</th>
-            <th>Tujuan</th>
+            <th>Supplier</th>
             <th>Barang</th>
             <th>Satuan</th>
             <th>Jumlah</th>
@@ -243,8 +243,8 @@
           <tr>
             <td>1</td>
             <td>22/05/2024</td>
-            <td>OUT/0011</td>
-            <td>Produksi</td>
+            <td>INV/0011</td>
+            <td>PT. Jaya</td>
             <td>Kertas A4</td>
             <td>Rim</td>
             <td>100</td>
@@ -263,8 +263,8 @@
           <tr>
             <td>2</td>
             <td>22/05/2024</td>
-            <td>OUT/0011</td>
-            <td>Marketing</td>
+            <td>INV/0011</td>
+            <td>PT. Abadi</td>
             <td>Kertas A4</td>
             <td>Rim</td>
             <td>100</td>
@@ -283,8 +283,8 @@
           <tr>
             <td>3</td>
             <td>22/05/2024</td>
-            <td>OUT/0011</td>
-            <td>HRD</td>
+            <td>INV/0011</td>
+            <td>PT. Ultra</td>
             <td>Kertas A4</td>
             <td>Rim</td>
             <td>100</td>
@@ -336,7 +336,7 @@
         document.getElementById('inputBarang').value = '';
         document.getElementById('inputJumlah').value = '';
         document.getElementById('inputSatuan').value = '';
-        document.getElementById('inputTujuan').value = '';
+        document.getElementById('inputSupplier').value = '';
         document.getElementById('inputKeterangan').value = '';
     });
 
