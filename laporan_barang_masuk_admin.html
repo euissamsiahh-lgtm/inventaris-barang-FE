@@ -132,7 +132,7 @@
 
   <!-- Topbar -->
   <div class="topbar">
-    <div class="menu-icon">
+    <div class="menu-icon" id="menuToggle">
       <span></span><span></span><span></span>
     </div>
     <div class="profile-section">
@@ -284,7 +284,7 @@
 
   <script>
     // Sidebar Logic
-    const menuBtn = document.querySelector('.menu-icon');
+    const menuBtn = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const closeBtn = document.getElementById('closeSidebar');

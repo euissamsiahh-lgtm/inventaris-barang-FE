@@ -330,22 +330,37 @@
       window.location.href = 'login.html';
     }
 
-    // Reset Form
-    document.getElementById('btnReset').addEventListener('click', () => {
-        document.getElementById('inputTanggal').value = '';
-        document.getElementById('inputBarang').value = '';
-        document.getElementById('inputJumlah').value = '';
-        document.getElementById('inputSatuan').value = '';
-        document.getElementById('inputSupplier').value = '';
-        document.getElementById('inputKeterangan').value = '';
-    });
+    const tableBody = document.getElementById('tableBody');
 
-    // We can also fetch dropdown data automatically when API is ready
+    // Helper to format date from dd/mm/yyyy to yyyy-mm-dd
+    function toISODate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        // dd/mm/yyyy -> yyyy-mm-dd
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return dateStr;
+    }
+
+    // Helper to format date from yyyy-mm-dd to dd/mm/yyyy
+    function toDisplayDate(dateStr) {
+      if (!dateStr) return '';
+      if (dateStr.includes('-')) {
+        const parts = dateStr.split('T')[0].split('-');
+        if (parts.length === 3) {
+          return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+      }
+      return dateStr;
+    }
+
+    // Load Dropdowns
     async function fetchDropdowns() {
       try {
         const [resBarang, resSatuan] = await Promise.all([
-          fetch(`${API_BASE}/barang`, { headers }),
-          fetch(`${API_BASE}/satuan`, { headers })
+          fetch(`${API_BASE}/barangs`, { headers }),
+          fetch(`${API_BASE}/satuans`, { headers })
         ]);
         if (resBarang.ok) {
           const d = await resBarang.json();
@@ -360,7 +375,114 @@
       } catch(e) { console.warn('Gagal memuat opsi dropdown:', e); }
     }
 
-    document.addEventListener('DOMContentLoaded', fetchDropdowns);
+    // Fetch Barang Masuk List
+    async function fetchList() {
+      tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--muted); padding: 32px 0;">Memuat data...</td></tr>';
+      try {
+        const res = await fetch(`${API_BASE}/laporan/barang-masuk`, { headers });
+        if (res.status === 401) { logout(); return; }
+        const data = await res.json();
+        if (res.ok && data.data) {
+          const list = data.data.laporan || [];
+          tableBody.innerHTML = '';
+          if (list.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--muted); padding: 32px 0;">Tidak ada data ditemukan</td></tr>';
+            return;
+          }
+          list.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${idx + 1}</td>
+              <td>${toDisplayDate(item.tanggal_masuk)}</td>
+              <td>${item.no_referensi || '-'}</td>
+              <td>${item.supplier || '-'}</td>
+              <td>${item.barang || '-'}</td>
+              <td>${item.satuan || '-'}</td>
+              <td>${item.jumlah || 0}</td>
+              <td>${item.keterangan || '-'}</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn-icon" title="Edit" onclick="editItem(${item.id})">
+                    <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                  </button>
+                  <button class="btn-icon" title="Hapus" onclick="deleteItem(${item.id})">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  </button>
+                </div>
+              </td>
+            `;
+            tableBody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red; padding: 32px 0;">Gagal memuat list barang masuk</td></tr>';
+      }
+    }
+
+    // Save Entry
+    document.getElementById('btnSimpan').addEventListener('click', async () => {
+      const barangId = document.getElementById('inputBarang').value;
+      const jumlah = document.getElementById('inputJumlah').value;
+      const tanggal = document.getElementById('inputTanggal').value;
+      const supplier = document.getElementById('inputSupplier').value;
+      const keterangan = document.getElementById('inputKeterangan').value;
+
+      if (!tanggal || !barangId || !jumlah) {
+        alert('Tanggal, barang, dan jumlah wajib diisi!');
+        return;
+      }
+
+      const payload = {
+        barang_id: parseInt(barangId),
+        jenis: 'masuk',
+        jumlah: parseInt(jumlah),
+        tanggal: toISODate(tanggal),
+        supplier: supplier, // Send both in case backend accepts it
+        keterangan: keterangan || `Supplier: ${supplier}`
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/mutasi`, {
+          method: 'POST',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Barang masuk berhasil disimpan!');
+          document.getElementById('btnReset').click();
+          fetchList();
+        } else {
+          alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
+        }
+      } catch(e) {
+        alert('Kesalahan jaringan');
+      }
+    });
+
+    // Reset Form
+    document.getElementById('btnReset').addEventListener('click', () => {
+        document.getElementById('inputTanggal').value = '';
+        document.getElementById('inputBarang').value = '';
+        document.getElementById('inputJumlah').value = '';
+        document.getElementById('inputSatuan').value = '';
+        document.getElementById('inputSupplier').value = '';
+        document.getElementById('inputKeterangan').value = '';
+    });
+
+    // Edit/Delete Placeholder Alerts
+    window.editItem = function(id) {
+      alert('Fitur edit transaksi dapat diakses via panel admin atau hubungi pengelola.');
+    };
+
+    window.deleteItem = function(id) {
+      alert('Fitur hapus transaksi dapat diakses via panel admin atau hubungi pengelola.');
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchDropdowns();
+      fetchList();
+    });
   </script>
 </body>
 </html>

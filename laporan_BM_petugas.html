@@ -303,13 +303,81 @@
       window.location.href = 'login.html';
     }
 
-    // Dummy logic for search/reset button interaction for now
+    const tableBody = document.getElementById('tableBody');
+
+    function formatRupiah(angka) {
+      if(!angka) return '0';
+      return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    async function fetchLaporanBM() {
+      tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 32px 0;">Memuat data...</td></tr>';
+      
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      const supplier = document.getElementById('filterSupplier').value;
+      const barang = document.getElementById('filterBarang').value;
+
+      const params = new URLSearchParams();
+      if (start) params.append('start_date', start);
+      if (end) params.append('end_date', end);
+      if (supplier) params.append('supplier', supplier);
+      if (barang) params.append('barang', barang);
+
+      try {
+        const res = await fetch(`${API_BASE}/laporan/barang-masuk?${params.toString()}`, { headers });
+        if (res.status === 401) { logout(); return; }
+        const data = await res.json();
+        
+        if (res.ok && data.data) {
+          const d = data.data;
+          // Update stats
+          document.getElementById('valTotalBarang').textContent = d.summary?.total_barang ?? '-';
+          document.getElementById('valTotalStok').textContent = d.summary?.total_stok ?? '-';
+          document.getElementById('valBarangMasuk').textContent = d.summary?.barang_masuk ?? '-';
+          document.getElementById('valBarangKeluar').textContent = d.summary?.barang_keluar ?? '-';
+
+          // Render table
+          const list = d.laporan || [];
+          tableBody.innerHTML = '';
+          if (list.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 32px 0;">Tidak ada data ditemukan</td></tr>';
+            return;
+          }
+          list.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${idx + 1}</td>
+              <td>${item.tanggal_masuk || '-'}</td>
+              <td>${item.no_referensi || '-'}</td>
+              <td>${item.supplier || '-'}</td>
+              <td>${item.barang || '-'}</td>
+              <td>${item.satuan || '-'}</td>
+              <td>${item.jumlah || 0}</td>
+              <td>Rp ${formatRupiah(item.harga_satuan)}</td>
+              <td>Rp ${formatRupiah(item.total)}</td>
+              <td>${item.keterangan || '-'}</td>
+            `;
+            tableBody.appendChild(tr);
+          });
+        } else {
+          tableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: red; padding: 32px 0;">Gagal: ${data.message}</td></tr>`;
+        }
+      } catch (err) {
+        tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: red; padding: 32px 0;">Terjadi kesalahan jaringan</td></tr>';
+      }
+    }
+
+    document.getElementById('btnFilter').addEventListener('click', fetchLaporanBM);
     document.getElementById('btnReset').addEventListener('click', () => {
-        document.getElementById('startDate').value = '';
-        document.getElementById('endDate').value = '';
-        document.getElementById('filterSupplier').value = '';
-        document.getElementById('filterBarang').value = '';
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+      document.getElementById('filterSupplier').value = '';
+      document.getElementById('filterBarang').value = '';
+      fetchLaporanBM();
     });
+
+    document.addEventListener('DOMContentLoaded', fetchLaporanBM);
   </script>
 </body>
 </html>

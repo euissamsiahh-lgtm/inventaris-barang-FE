@@ -353,11 +353,21 @@
       tbody.innerHTML = list.map(item => `<tr><td>${item.kode_barang||'-'}</td><td>${item.nama_barang||'-'}</td><td>${item.stok||'-'} ${item.satuan||''}</td></tr>`).join('');
     }
 
+    // Helper to format date from dd/mm/yyyy to yyyy-mm-dd
+    function toISODate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return dateStr;
+    }
+
     async function fetchDropdowns() {
       try {
         const [resBarang, resSatuan] = await Promise.all([
-          fetch(`${API_BASE}/barang`, { headers }),
-          fetch(`${API_BASE}/satuan`, { headers })
+          fetch(`${API_BASE}/barangs`, { headers }),
+          fetch(`${API_BASE}/satuans`, { headers })
         ]);
         if (resBarang.ok) {
           const d = await resBarang.json();
@@ -373,10 +383,25 @@
     }
 
     document.getElementById('btnSimpanMasuk').addEventListener('click', async () => {
-      const payload = { tanggal: document.getElementById('masukTanggal').value, barang_id: document.getElementById('masukBarang').value, jumlah: document.getElementById('masukJumlah').value, satuan_id: document.getElementById('masukSatuan').value, supplier: document.getElementById('masukSupplier').value, keterangan: document.getElementById('masukKet').value };
-      if (!payload.tanggal || !payload.barang_id || !payload.jumlah) { alert('Tanggal, barang, dan jumlah wajib diisi!'); return; }
+      const tanggalVal = document.getElementById('masukTanggal').value;
+      const barangId = document.getElementById('masukBarang').value;
+      const jumlah = document.getElementById('masukJumlah').value;
+      const supplier = document.getElementById('masukSupplier').value;
+      const keterangan = document.getElementById('masukKet').value;
+
+      if (!tanggalVal || !barangId || !jumlah) { alert('Tanggal, barang, dan jumlah wajib diisi!'); return; }
+      
+      const payload = {
+        tanggal: toISODate(tanggalVal),
+        barang_id: parseInt(barangId),
+        jenis: 'masuk',
+        jumlah: parseInt(jumlah),
+        supplier: supplier,
+        keterangan: keterangan || `Supplier: ${supplier}`
+      };
+
       try {
-        const res = await fetch(`${API_BASE}/barang-masuk`, { method: 'POST', headers: {...headers,'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const res = await fetch(`${API_BASE}/mutasi`, { method: 'POST', headers: {...headers,'Content-Type':'application/json'}, body: JSON.stringify(payload) });
         const data = await res.json();
         if (res.ok) { alert('Barang masuk berhasil disimpan!'); document.getElementById('btnResetMasuk').click(); fetchDashboard(); }
         else alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
@@ -388,10 +413,25 @@
     });
 
     document.getElementById('btnSimpanKeluar').addEventListener('click', async () => {
-      const payload = { tanggal: document.getElementById('keluarTanggal').value, barang_id: document.getElementById('keluarBarang').value, jumlah: document.getElementById('keluarJumlah').value, satuan_id: document.getElementById('keluarSatuan').value, tujuan: document.getElementById('keluarTujuan').value, keterangan: document.getElementById('keluarKet').value };
-      if (!payload.tanggal || !payload.barang_id || !payload.jumlah) { alert('Tanggal, barang, dan jumlah wajib diisi!'); return; }
+      const tanggalVal = document.getElementById('keluarTanggal').value;
+      const barangId = document.getElementById('keluarBarang').value;
+      const jumlah = document.getElementById('keluarJumlah').value;
+      const tujuan = document.getElementById('keluarTujuan').value;
+      const keterangan = document.getElementById('keluarKet').value;
+
+      if (!tanggalVal || !barangId || !jumlah) { alert('Tanggal, barang, dan jumlah wajib diisi!'); return; }
+      
+      const payload = {
+        tanggal: toISODate(tanggalVal),
+        barang_id: parseInt(barangId),
+        jenis: 'keluar',
+        jumlah: parseInt(jumlah),
+        tujuan: tujuan,
+        keterangan: keterangan || `Tujuan: ${tujuan}`
+      };
+
       try {
-        const res = await fetch(`${API_BASE}/barang-keluar`, { method: 'POST', headers: {...headers,'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const res = await fetch(`${API_BASE}/mutasi`, { method: 'POST', headers: {...headers,'Content-Type':'application/json'}, body: JSON.stringify(payload) });
         const data = await res.json();
         if (res.ok) { alert('Barang keluar berhasil disimpan!'); document.getElementById('btnResetKeluar').click(); fetchDashboard(); }
         else alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
