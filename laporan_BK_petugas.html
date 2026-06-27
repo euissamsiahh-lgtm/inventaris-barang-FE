@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laporan Barang Masuk - STOK.KU</title>
+  <title>Laporan Barang Keluar - STOK.KU</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -98,7 +98,7 @@
 </head>
 <body>
 
-  <!-- Sidebar Overlay & Menu -->
+  <!-- Sidebar -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -116,8 +116,8 @@
       <a href="#" class="nav-link">Barang Keluar</a>
       
       <div class="sidebar-section-title">Laporan</div>
-      <a href="laporan_BM_petugas.html" class="nav-link active">Laporan Barang Masuk</a>
-      <a href="laporan_BK_petugas.html" class="nav-link">Laporan Barang Keluar</a>
+      <a href="laporan_BM_petugas.html" class="nav-link">Laporan Barang Masuk</a>
+      <a href="laporan_BK_petugas.html" class="nav-link active">Laporan Barang Keluar</a>
       <a href="laporan_stok_petugas.html" class="nav-link">Laporan Stok</a>
     </nav>
     <div class="sidebar-footer">
@@ -146,7 +146,7 @@
   </div>
 
   <div class="page">
-    <h1 class="page-title">Laporan Barang Masuk</h1>
+    <h1 class="page-title">Laporan Barang Keluar</h1>
 
     <!-- Filter Card -->
     <div class="filter-card">
@@ -163,8 +163,8 @@
           </div>
         </div>
         <div class="filter-item" style="flex: 1; max-width: 250px;">
-          <label>Supplier</label>
-          <input type="text" class="filter-input" id="filterSupplier" placeholder="Masukkan Nama Supplier">
+          <label>Satuan</label>
+          <input type="text" class="filter-input" id="filterSatuan" placeholder="Masukkan Satuan">
         </div>
         <div class="filter-item" style="flex: 1; max-width: 250px;">
           <label>Barang</label>
@@ -219,59 +219,59 @@
 
     <!-- Table Section -->
     <div class="table-card">
-      <h3 class="table-title">Daftar Barang Masuk</h3>
+      <h3 class="table-title">Daftar Barang Keluar</h3>
       <table class="table">
         <thead>
           <tr>
             <th>No</th>
-            <th>Tanggal Masuk</th>
+            <th>Tanggal Keluar</th>
             <th>No. Referensi</th>
-            <th>Supplier</th>
+            <th>Tujuan</th>
             <th>Barang</th>
             <th>Satuan</th>
             <th>Jumlah</th>
             <th>Harga Satuan</th>
             <th>Total (Rp)</th>
-            <th>Ket</th>
+            <th>Keterangan</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <!-- Default Data like the design -->
+          <!-- Default Data -->
           <tr>
             <td>1</td>
             <td>22/05/2024</td>
             <td>INV/0011</td>
-            <td>P.T Sumber</td>
-            <td>Kertas HVS</td>
+            <td>Produksi</td>
+            <td>Kertas A4</td>
             <td>Rim</td>
             <td>100</td>
             <td>50.000</td>
             <td>5,000,000</td>
-            <td>-</td>
+            <td>Keperluan Cetak</td>
           </tr>
           <tr>
             <td>2</td>
             <td>22/05/2024</td>
             <td>INV/0011</td>
-            <td>P.T Sumber</td>
-            <td>Kertas HVS</td>
+            <td>Marketing</td>
+            <td>Kertas A4</td>
             <td>Rim</td>
             <td>100</td>
             <td>50.000</td>
             <td>5,000,000</td>
-            <td>-</td>
+            <td>Event Promosi</td>
           </tr>
           <tr>
             <td>3</td>
             <td>22/05/2024</td>
             <td>INV/0011</td>
-            <td>P.T Sumber</td>
-            <td>Kertas HVS</td>
+            <td>HRD</td>
+            <td>Kertas A4</td>
             <td>Rim</td>
             <td>100</td>
             <td>50.000</td>
             <td>5,000,000</td>
-            <td>-</td>
+            <td>Keperluan Arsip</td>
           </tr>
         </tbody>
       </table>
@@ -303,11 +303,11 @@
       window.location.href = 'login.html';
     }
 
-    // Dummy logic for search/reset button interaction for now
+    // Dummy logic for search/reset button interaction
     document.getElementById('btnReset').addEventListener('click', () => {
         document.getElementById('startDate').value = '';
         document.getElementById('endDate').value = '';
-        document.getElementById('filterSupplier').value = '';
+        document.getElementById('filterSatuan').value = '';
         document.getElementById('filterBarang').value = '';
     });
   </script>
