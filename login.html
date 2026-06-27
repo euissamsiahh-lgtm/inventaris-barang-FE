@@ -340,7 +340,7 @@
 
                     <div class="divider">Atau</div>
 
-                    <button type="button" class="btn btn-secondary">Masuk Sebagai Petugas</button>
+                    <button type="button" class="btn btn-secondary" id="switchBtn" onclick="switchMode()">Masuk Sebagai Petugas</button>
                 </form>
             </div>
         </main>
@@ -356,8 +356,35 @@
     </div>
 
     <script>
-        const API_URL = 'http://192.168.1.71/inventaris-barang-BE/public/api/login';
+        // Mode: 'admin' or 'petugas'
+        let currentMode = 'admin';
+
+        const API_BASE = 'http://192.168.1.71/inventaris-barang-BE/public/api';
+        const API_ADMIN_LOGIN   = `${API_BASE}/login`;
+        const API_PETUGAS_LOGIN = `${API_BASE}/login`; // Ganti jika endpoint petugas berbeda
+
         let toastTimer;
+
+        function switchMode() {
+            const formHeader = document.querySelector('.form-header h2');
+            const formSubtitle = document.querySelector('.form-header p');
+            const switchBtn = document.getElementById('switchBtn');
+            const badge = document.getElementById('modeBadge');
+
+            if (currentMode === 'admin') {
+                currentMode = 'petugas';
+                formHeader.textContent = 'Masuk Petugas';
+                formSubtitle.textContent = 'Silakan masuk sebagai petugas';
+                switchBtn.textContent = 'Masuk Sebagai Admin';
+                if (badge) { badge.textContent = 'Mode Petugas'; badge.style.background = '#e0f2fe'; badge.style.color = '#0369a1'; }
+            } else {
+                currentMode = 'admin';
+                formHeader.textContent = 'Masuk';
+                formSubtitle.textContent = 'Silakan masuk untuk melanjutkan';
+                switchBtn.textContent = 'Masuk Sebagai Petugas';
+                if (badge) { badge.textContent = 'Mode Admin'; badge.style.background = '#ede9fe'; badge.style.color = '#5b21b6'; }
+            }
+        }
 
         function showToast(message, type = 'error') {
             const toast = document.getElementById('toast');
@@ -426,11 +453,18 @@
             const prevText = submitBtn.textContent;
             submitBtn.textContent = 'Memproses...';
 
+            // Pilih endpoint sesuai mode
+            const apiUrl = currentMode === 'admin' ? API_ADMIN_LOGIN : API_PETUGAS_LOGIN;
+            // Tambahkan role ke payload jika dibutuhkan backend
+            const payload = currentMode === 'admin'
+                ? { email, password }
+                : { email, password, role: 'petugas' };
+
             try {
-                const res = await fetch(API_URL, {
+                const res = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({email, password})
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await res.json().catch(()=>({}));
@@ -438,9 +472,15 @@
                 if (res.ok) {
                     if (data.access_token) localStorage.setItem('access_token', data.access_token);
                     else if (data.token) localStorage.setItem('auth_token', data.token);
-                    
+
+                    // Simpan role untuk referensi halaman lain
+                    localStorage.setItem('user_role', currentMode);
+
                     showToast('Login berhasil! Mengalihkan...', 'success');
-                    setTimeout(() => { window.location.href = 'dashboard_admin.html'; }, 800);
+
+                    // Redirect sesuai role
+                    const target = currentMode === 'admin' ? 'dashboard_admin.html' : 'dashboard_admin.html';
+                    setTimeout(() => { window.location.href = target; }, 800);
                 } else {
                     setInputError('email', true);
                     setInputError('password', true);
