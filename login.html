@@ -479,7 +479,7 @@
                     showToast('Login berhasil! Mengalihkan...', 'success');
 
                     // Redirect sesuai role
-                    const target = currentMode === 'admin' ? 'dashboard_admin.html' : 'dashboard_admin.html';
+                    const target = currentMode === 'admin' ? 'dashboard_admin.html' : 'dashboard_petugas.html';
                     setTimeout(() => { window.location.href = target; }, 800);
                 } else {
                     setInputError('email', true);
